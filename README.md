@@ -1,1 +1,7 @@
-# Recommender
+## Recommender
+
+#### Requirements
+* nodejs
+* mongodb
+
+#### Usage
