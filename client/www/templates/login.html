@@ -1,0 +1,8 @@
+<div class="list list-inset" ng-controller="loginCtrl" ng-if="!logged_in">
+    <label class="item item-input">
+        <i class="icon ion-android-call placeholder-icon"></i>
+        <div class="input-label">Phone No</div>
+        <input type="tel" ng-model="phone_no"/>
+    </label>
+    <button class="item button button-block button-calm" ng-click="login()">Login</button>
+</div>
