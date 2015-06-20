@@ -1,13 +1,21 @@
-recommender.controller('loginCtrl', ['$scope', '$resource', 'db', '$state', function($scope, $resource, db, $state) {
+recommender.controller('loginCtrl', function($scope, $resource, db, $state, $http) {
     $scope.login = function() {
         if($scope.phone_no) {
             console.log('logging in...');
-            db.insert_user($scope.phone_no).then(function(result) {
-                $scope.logged_in = true;
-                console.log('successfully logged in.', result);
-            }, function(err) {
-                $scope.logged_in = false;
-                console.log('an error occured during login.', err);
+
+            SERVER = 'http://localhost:9000';
+            $http.post(SERVER + '/login', {
+                phoneNumber: $scope.phone_no
+            }).success(function(response, status, headers, config) {
+                db.insert_user($scope.phone_no).then(function(result) {
+                    $scope.logged_in = true;
+                    console.log('successfully logged in.', result);
+                }, function(err) {
+                    $scope.logged_in = false;
+                    console.log('an error occured during login.', err);
+                });
+            }).error(function(response, status, headers, config) {               
+                console.log('failed to login to server');
             });
         }
         else {
@@ -26,4 +34,4 @@ recommender.controller('loginCtrl', ['$scope', '$resource', 'db', '$state', func
             $scope.logged_in = true;
         }
     });
-}]);
+});
