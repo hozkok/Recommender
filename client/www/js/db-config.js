@@ -9,14 +9,22 @@ recommender.constant('DB_CONF', {
             ]
         },
         {
-            name: 'friend',
+            name: 'friends',
             attrs: [
                 {name: 'name', type: 'text'},
                 {name: 'phone', type: 'text unique'}
             ]
         },
         {
-            name: 'message',
+            name: 'topics',
+            attrs: [
+                {name: '`where`', type: 'text'},
+                {name: '`when`', type: 'text'},
+                {name: 'description', type: 'text'}
+            ]
+        },
+        {
+            name: 'messages',
             attrs: [
                 {name: 'text', type: 'text'},
                 {name: 'sender', type: 'text'},

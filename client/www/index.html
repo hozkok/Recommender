@@ -28,6 +28,7 @@
     <script src="js/db-config.js"></script>
     <script src="js/db-service.js"></script>
     <script src="js/login-controller.js"></script>
+    <script src="js/topic-controller.js"></script>
     <script src="js/run.js"></script>
   </head>
 <body ng-app="starter">
@@ -36,9 +37,8 @@
         <ion-header-bar class="bar-dark">
             <h1 class="title">Recommender</h1>
         </ion-header-bar>
-        <ion-content>
-            <ng-include src="'templates/login.html'"></ng-include>
-        </ion-content>
+        <ion-nav-view></ion-nav-view>
+        <!-- <ng-include src="'templates/login.html'"></ng-include> -->
     </ion-pane>
 </body>
 </html>

@@ -1,4 +1,4 @@
-recommender.run(function($ionicPlatform, db) {
+recommender.run(function($ionicPlatform, db, $state) {
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -9,5 +9,6 @@ recommender.run(function($ionicPlatform, db) {
             StatusBar.styleDefault();
         }
         db.init();
+        $state.go('login');
     });
 });

@@ -4,7 +4,6 @@ var mongoose = require('mongoose'),
 
 var Message = new Schema({
     sender: {type: ObjectId, ref: 'User'},
-    receiver: {type: ObjectId, ref: 'User'},
     text: String,
     date: {type: Date, default: Date.now},
     isSent: {type: Boolean, default: false}
