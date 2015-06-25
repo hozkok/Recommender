@@ -31,8 +31,24 @@ var get_topic = function(topic_id, process_topic) {
                 process_topic(topic);
             }
         })
-}
+};
 
+
+var get_user = function(phone, process_user) {
+    models.User.findOne({phoneNum: phone}).exec(function(err, usr) {
+        if(err) {
+            console.log('cannot get user with phone no:', phone);
+        }
+        else {
+            if(process_user) {
+                process_user(usr);
+            }
+            else {
+                console.log('get_user: no callback function is specified.');
+            }
+        }
+    });
+};
 
 
 
@@ -42,58 +58,39 @@ module.exports = {
     },
 
 
-    new_user: function(name, phone) {
+    new_user: function(name, phone, callback) {
         var usr = new models.User({uname: name, phoneNum: phone});
         usr.save(function(err) {
             if(err) {
                 console.log('new_user error:', err);
             }
             else {
-                console.log('user: ', name, 'successfully saved into db.');
+                console.log('user:', name, 'successfully saved into db.');
             }
+            get_user(phone, callback);
         });
     },
 
 
-    get_user: function(phone, process_user) {
-        models.User.findOne({phoneNum: phone}).exec(function(err, usr) {
-            if(err || !usr) {
-                console.log('cannot get user with phone no:', phone);
-            }
-            else {
-                if(process_user) {
-                    process_user(usr);
-                }
-                else {
-                    console.log('get_user: no callback function is specified.');
-                }
-            }
-        });
-    },
+    get_user: get_user,
 
 
     new_topic: function(attrs) {
-        if(!attrs.owner_phone || !attrs.what) {
-            console.log('topic owner_phone and what attrs cannot be empty.');
+        if(!attrs.owner || !attrs.what) {
+            console.log('topic owner and what attrs cannot be empty.');
         }
-        models.User
-            .findOne({phoneNum: attrs.owner_phone})
-            .exec(function(err, usr) {
-                if(err)
-                    console.log(err);
+        else {
+            attrs.owner = new ObjectId(attrs.owner);
+            var topic = new models.Topic(attrs);
+            topic.save(function(err) {
+                if(err) {
+                    console.log('new_topic error:', err);
+                }
                 else {
-                    attrs.owner = usr;
-                    var topic = new models.Topic(attrs);
-                    topic.save(function(err) {
-                    if(err) {
-                        console.log('new_topic error:', err);
-                    }
-                    else {
-                        console.log('topic: ', attrs.what, 'successfully saved into db.');
-                    }
-                });
+                    console.log('topic:', attrs.what, 'successfully saved into db.');
                 }
             });
+        }
     },
 
 
@@ -129,5 +126,25 @@ module.exports = {
     },
 
     
+    get_topic_list: function(usr_id, callback) {
+        models.Topic
+            .find({owner: usr_id})
+            .populate('owner')
+            .exec(function(err, topics) {
+                if(err || !topics) {
+                    console.log('couldn\'t find topics for specified user.');
+                }
+                else {
+                    if(callback) {
+                        callback(topics);
+                    }
+                    else {
+                        console.log('you need to pass callback function!');
+                    }
+                }
+            });
+    },
+
+
     get_topic_data: get_topic
 }

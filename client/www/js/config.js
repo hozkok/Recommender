@@ -8,7 +8,7 @@ recommender.config(['$stateProvider', '$urlRouterProvider', function($stateProvi
         .state('topics', {
             templateUrl: 'templates/topics.html',
             controller: 'topicCtrl',
-            params: {phone: null}
+            params: {phone: null, uid: null}
         });
     //$urlRouterProvider.otherwise('/login');
 }]);

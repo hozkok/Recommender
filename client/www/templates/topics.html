@@ -1,7 +1,10 @@
-<ion-view>
+<ion-view view-title="Topics">
 <ion-content>
-    <div>
-        list of topics for phone number {{phone}}
-    </div>
+    <ion-list>
+    <ion-item ng-repeat="topic in topics" item="item" ui-sref="topic({id: topic._id})">
+            <h2>{{topic.what}}<h2>
+            <p>{{topic.owner.uname}}</p>
+        <ion-item>
+    </ion-list>
 <ion-content>
 </ion-view>

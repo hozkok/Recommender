@@ -34,6 +34,29 @@ router.get('/', function(req, res) {
     res.json({ message: 'server is up' });   
 });
 
+app.get('/login/:phone_no', function(req, res) {
+    db.get_user(req.params.phone_no, function(user) {
+        res.send(user);
+    });
+});
+
+
+app.post('/login', function(req, res) {
+    console.log('login post request', req.body);
+    db.new_user(req.body.name, req.body.phone_no, function(user) {
+        res.send(user);
+    });
+});
+
+
+app.get('/topics/:usr_id', function(req, res) {
+    console.log('new topics request->', req.params.usr_id);
+    db.get_topic_list(req.params.usr_id, function(topics) {
+        console.log(topics);
+        res.send(topics);
+    });
+});
+
 app.use('/api', router);
 
 app.route('/login')

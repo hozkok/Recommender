@@ -3,7 +3,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     var db = null;
 
     var populate_db = function(tx) {
-        tx.executeSql('DROP TABLE IF EXISTS user');
+        //tx.executeSql('DROP TABLE IF EXISTS user');
         //tx.executeSql('DROP TABLE IF EXISTS topics');
         angular.forEach(DB_CONF.tables, function(table) {
             var attrs = [];
@@ -62,9 +62,9 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return execute_sql('SELECT * FROM user');
     };
 
-    var insert_user = function(phone, name) {
+    var insert_user = function(id, phone, name) {
         name = typeof name !== 'undefined' ? name : '';
-        return execute_sql('INSERT INTO user VALUES(?, ?)', [name, phone]);
+        return execute_sql('INSERT INTO user VALUES(?, ?, ?)', [id, name, phone]);
     };
 
     var get_messages = function(sender) {
