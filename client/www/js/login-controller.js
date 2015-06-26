@@ -10,7 +10,7 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
 
 
         var save_and_go = function(usr) {
-            db.insert_user(usr._id, usr.uname, usr.phoneNum)
+            db.insert_user(usr._id, usr.phoneNum, usr.uname)
             .then(function(result) {
                 $state.go('topics', {uid: usr._id, phone: usr.phoneNum});
             });
@@ -22,34 +22,36 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
             //success
             function(usr) {
                 if(usr) {
+                    console.log(usr);
                     save_and_go(usr);
                 }
                 else {
-                    if(!$scope.user.name) {
-                        console.log('name cannot be empty.');
-                    }
-                    else {
-                        Login.save($scope.user).$promise.then(
-                            //success
-                            function(result) {
-                                if(result) {
-                                    save_and_go(result);
-                                }
-                                else {
-                                    console.log('something is wrong...');
-                                }
-                            },
-                            //error
-                            function(err) {
-                                console.log('error', err);
-                            }
-                        );
-                    }
+                    console.log('something is horribly wrong...');
                 }
             },
             //error
             function(err) {
                 console.log('error:', err);
+                if(!$scope.user.name) {
+                    console.log('therefore name cannot be empty.');
+                }
+                else {
+                    Login.save($scope.user).$promise.then(
+                        //success
+                        function(result) {
+                            if(result) {
+                                save_and_go(result);
+                            }
+                            else {
+                                console.log('something is wrong...');
+                            }
+                        },
+                        //error
+                        function(err) {
+                            console.log('error', err);
+                        }
+                    );
+                }
             }
         );
 
