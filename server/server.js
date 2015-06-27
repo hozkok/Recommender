@@ -42,8 +42,9 @@ app.route('/login/:phone_no?')
 // app.get('/login/:phone_no', db.get_user);
 // app.post('/login', db.new_user);
 
-
-app.get('/topics/:usr_id', db.get_topic_list);
+app.route('/topics/:usr_id?')
+    .get(db.get_topic_list)
+    .post(db.new_topic);
 
 app.use('/api', router);
 

@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var ObjectId = mongoose.Types.ObjectId;
 var models = require('./models/models');
+var push = require('./push');
+
 // mongoose.connect('mongodb://localhost/recommender');
 
 var db = mongoose.connection;
@@ -154,6 +156,13 @@ var get_topic_list = function(usr_id, callback) {
         });
 };
 
+var get_user_push_tokens = function (numbers, callback) {
+    // TODO: find and return the pushTokens for the given numbers
+
+    // To test, replace this with the token in your browser console.
+    callback(['DEV-43bd86e6-4d68-42ff-993b-b18208b31e88']);
+};
+
 
 module.exports = {
     connect: function() {
@@ -188,6 +197,16 @@ module.exports = {
 
     new_topic: function(req, res) {
         //TODO: check request body and construct new topic. (new_topic func is defined)
+        //      request body includes:  topic (what, where, desc), 
+        //                              receivers
+
+        console.log('new_topic request: ' + JSON.stringify(req.body));
+
+        // Get user push tokens from db using the receivers phone numbers
+        get_user_push_tokens(req.body.receivers, function (tokens) {
+            push.pushTopic(req.body.topic, tokens);
+            res.sendStatus(200);
+        });
     },
 
 

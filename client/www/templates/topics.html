@@ -1,5 +1,9 @@
 <ion-view view-title="Topics">
 <ion-content>
+	<!-- // ================== TEST CODE (Remove) ===================== -->
+	<button class="item button button-block button-calm" ng-click="push()">push</button>
+	<!-- // ================== TEST CODE (Remove) ===================== -->
+	
     <ion-list>
     <ion-item ng-repeat="topic in topics" item="item" ui-sref="topic({id: topic._id})">
             <h2>{{topic.what}}<h2>
