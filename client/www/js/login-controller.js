@@ -1,6 +1,30 @@
-recommender.controller('loginCtrl', function($scope, $resource, db, $state, $http, Login) {
+recommender.controller('loginCtrl', function($scope, $resource, db, $state, $http, $rootScope, $ionicPush, Login) {
     console.log('login controller is initialized.');
     $scope.user = {};
+
+    var pushRegister = function () {
+        $rootScope.$on('$cordovaPush:tokenReceived', function(event, data) {
+            console.log('Ionic Push: Got token ', data.token, data.platform);
+            $scope.user.pushToken = data.token;
+        });
+
+        $ionicPush.register({
+            canShowAlert: true, 
+            canSetBadge: true, 
+            canPlaySound: true,
+            canRunActionsOnWake: true, 
+            // TODO: OnNotification should be a function somewhere else,
+            //       we need to think about how to handle this
+            onNotification: function(notification) {
+                console.log('notification: ', notification.alert);
+                return true;
+            }
+        });
+    };
+
+    pushRegister();
+
+
     $scope.login = function() {
         console.log($scope.user.phone_no, $scope.user.name);
         if(!$scope.user.phone_no) {
@@ -54,35 +78,11 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
                 }
             }
         );
-
-        //console.log('logging in...');
-
-        //SERVER = 'http://localhost:9000';
-        //$http.post(SERVER + '/login', {
-        //    phoneNumber: $scope.user.phone_no,
-        //    name: $scope.user.name
-        //}).success(function(response, status, headers, config) {
-        //    db.insert_user($scope.user.phone_no, $scope.user.name).then(function(result) {
-        //        $scope.logged_in = true;
-        //        console.log('successfully logged in.', result);
-        //        $state.go('topicList', {phone: $scope.user.phone_no});
-        //    }, function(err) {
-        //        $scope.logged_in = false;
-        //        console.log('an error occured during login.', err);
-        //    });
-        //}).error(function(response, status, headers, config) { 
-        //    console.log('failed to login to server');
-        //});
     };
 
     $scope.existing_login = function() {
         Login.save({asd: 'qwe', qwe: 'qweqwe'}, function(res) {
             console.log(res.a);
         });
-        //if($scope.user.phone_no)
-        //    Login.get({phone_no: $scope.user.phone_no}, function(user) {
-        //        console.log(user);
-        //        $state.go('topicList', {uid: user._id});
-        //    });
     };
 });
