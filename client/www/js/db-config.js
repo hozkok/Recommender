@@ -19,6 +19,8 @@ recommender.constant('DB_CONF', {
         {
             name: 'topics',
             attrs: [
+                {name: 'id', type: 'text unique'},
+                {name: 'owner_name', type: 'text'},
                 {name: '`where`', type: 'text'},
                 {name: '`when`', type: 'text'},
                 {name: 'description', type: 'text'}

@@ -36,8 +36,30 @@ db.connect();
 //         }
 // );
 
-db.get_user('0871234567', function(usr) {
-    db.get_topic_list(usr._id, function(topics) {
-        console.log(topics);
+var init_data = {
+    phone: '0871234567',
+    name: 'TestUser',
+    topics: [
+        {what: 'smartphone', where: 'galway', description: 'just want something to surf on the internet...'},
+        {what: 'kettle', where: 'galway', description: 'mine is just broken today, want a cheap one. :/'},
+        {what: 'laptop', where: 'dublin', description: 'I am a gamer but dont have much money. so...'},
+        {what: 'car', where: 'galway', description: 'I love hatchback cars and price range is €15-20k'}
+    ]
+};
+
+db.raw.new_user(init_data.name, init_data.phone, function(usr) {
+    init_data.topics.forEach(function(data) {
+        db.raw.new_topic({
+            owner: usr._id,
+            what: data.what,
+            where: data.where,
+            description: data.description
+        });
     });
 });
+
+//db.get_user('0871234567', function(usr) {
+//    db.get_topic_list(usr._id, function(topics) {
+//        console.log(topics);
+//    });
+//});

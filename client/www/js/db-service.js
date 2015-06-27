@@ -3,7 +3,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     var db = null;
 
     var populate_db = function(tx) {
-        tx.executeSql('DROP TABLE IF EXISTS user');
+        //tx.executeSql('DROP TABLE IF EXISTS user');
         //tx.executeSql('DROP TABLE IF EXISTS topics');
         angular.forEach(DB_CONF.tables, function(table) {
             var attrs = [];

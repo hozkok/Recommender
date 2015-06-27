@@ -17,7 +17,7 @@ recommender.run(function($ionicPlatform, db, $state) {
             }
             else {
                 console.log('result:', result.rows[0]);
-                $state.go('topics', {phone: result.rows[0].phone, uid: result.rows[0].id});
+                $state.go('topicList', {phone: result.rows[0].phone, uid: result.rows[0].id});
             }
         });
     });

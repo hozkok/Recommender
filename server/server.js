@@ -45,6 +45,11 @@ app.route('/login/:phone_no?')
 
 app.get('/topics/:usr_id', db.get_topic_list);
 
+
+app.route('/topic/:topic_id?')
+    .get(db.get_topic);
+
+
 app.use('/api', router);
 
 // app.route('/login')

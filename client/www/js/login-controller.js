@@ -12,7 +12,7 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
         var save_and_go = function(usr) {
             db.insert_user(usr._id, usr.phoneNum, usr.uname)
             .then(function(result) {
-                $state.go('topics', {uid: usr._id, phone: usr.phoneNum});
+                $state.go('topicList', {uid: usr._id, phone: usr.phoneNum});
             });
         };
 
@@ -65,7 +65,7 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
         //    db.insert_user($scope.user.phone_no, $scope.user.name).then(function(result) {
         //        $scope.logged_in = true;
         //        console.log('successfully logged in.', result);
-        //        $state.go('topics', {phone: $scope.user.phone_no});
+        //        $state.go('topicList', {phone: $scope.user.phone_no});
         //    }, function(err) {
         //        $scope.logged_in = false;
         //        console.log('an error occured during login.', err);
@@ -82,7 +82,7 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
         //if($scope.user.phone_no)
         //    Login.get({phone_no: $scope.user.phone_no}, function(user) {
         //        console.log(user);
-        //        $state.go('topics', {uid: user._id});
+        //        $state.go('topicList', {uid: user._id});
         //    });
     };
 });

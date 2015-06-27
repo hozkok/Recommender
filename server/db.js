@@ -84,23 +84,23 @@ var new_user = function(name, phone, callback) {
 };
 
 
-var new_topic = function(attrs) {
-    if(!attrs.owner || !attrs.what) {
-        console.log('topic owner and what attrs cannot be empty.');
-    }
-    else {
-        attrs.owner = new ObjectId(attrs.owner);
-        var topic = new models.Topic(attrs);
-        topic.save(function(err) {
-            if(err) {
-                console.log('new_topic error:', err);
-            }
-            else {
-                console.log('topic:', attrs.what, 'successfully saved into db.');
-            }
-        });
-    }
-};
+//var new_topic = function(attrs) {
+//    if(!attrs.owner || !attrs.what) {
+//        console.log('topic owner and what attrs cannot be empty.');
+//    }
+//    else {
+//        attrs.owner = new ObjectId(attrs.owner);
+//        var topic = new models.Topic(attrs);
+//        topic.save(function(err) {
+//            if(err) {
+//                console.log('new_topic error:', err);
+//            }
+//            else {
+//                console.log('topic:', attrs.what, 'successfully saved into db.');
+//            }
+//        });
+//    }
+//};
 
 
 var new_message = function(topic_id, sender_id, text) {
@@ -206,6 +206,16 @@ module.exports = {
 
     get_topic: function(req, res) {
         //TODO: get requested topic and send a response. (get_topic func is defined, use it)
+        var topic_id = req.params.topic_id;
+        if(!topic_id) {
+            res.sendStatus(400);
+        }
+        else {
+            get_topic(topic_id, function(topic) {
+                console.log('get topic response ->', topic && topic._id);
+                (topic) ? res.json(topic) : res.sendStatus(404);
+            });
+        }
     },
 
 
