@@ -1,5 +1,10 @@
 <ion-view>
     <ion-nav-title>{{topic.what}}</ion-nav-title>
+
+    <ion-nav-buttons side="primary">
+        <button class="button-clear" ng-click="go_back()"><i class="ion-arrow-left-c"></i>Topics</button>
+    </ion-nav-buttons>
+
     <ion-content>
         <ion-list>
             <ion-item>

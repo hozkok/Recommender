@@ -1,17 +1,18 @@
 var http = require('http');
 
-var pushService = {}
+var pushService = {};
 
 var APP_ID = 'ef898301';
 var API_KEY = '92611213d781d26680943ec09d0ba4a6e7741402006d488f';
 
 pushService.pushTopic = function (topic, tokens) {
        	console.log('topic: ' + JSON.stringify(topic));
+        console.log('tokens:', tokens);
 
        	var topicNotification = {
                	"tokens": tokens,
                	"notification":{
-                       	"alert": topic,
+                       	"alert": 'New Topic:' + topic,
                        	"ios": {
                                	"badge":1,
                                	"sound":"ping.aiff",

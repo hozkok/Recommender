@@ -3,7 +3,9 @@ recommender.factory('Topics', ['$resource', function($resource) {
 }]);
 
 recommender.factory('Login', ['$resource', function($resource) {
-    return $resource('http://localhost:9000/login/:phone_no');
+    return $resource('http://localhost:9000/user/:user_id', null, {
+        'update': {method: 'PUT'}
+    });
 }]);
 
 recommender.factory('Topic', ['$resource', function($resource) {

@@ -1,0 +1,26 @@
+<ion-view view-title="New Topic">
+    <ion-nav-buttons side="primary">
+        <button class="button-clear" ng-click="go_back()"><i class="ion-arrow-left-c"></i>Topics</button>
+    </ion-nav-buttons>
+
+    <ion-content>
+        <div class="list">
+            <label class="item item-input item-floating-label">
+                <span class="input-label">What</span>
+                <input type="text" placeholder="What" ng-model="topic.what">
+            </label>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Where</span>
+                <input type="text" placeholder="Where" ng-model="topic.where"/>
+            </label>
+            <label class="item item-input item-floating-label">
+                <span class="input-label">Description</span>
+                <textarea type="text" rows="4" style="resize: none;" placeholder="Description" ng-model="topic.description"></textarea>
+            </label>
+            <label class="item">
+                <button class="button button-positive" ng-click="show_participants()">Select Participants</button>
+            </label>
+            <button class="item button button-block button-balanced" style="margin: 10px auto 0 auto; width: 75%;">Create Topic</button>
+        </div>
+    </ion-content>
+</ion-view>

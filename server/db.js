@@ -158,9 +158,44 @@ var get_topic_list = function(usr_id, callback) {
 
 var get_user_push_tokens = function (numbers, callback) {
     // TODO: find and return the pushTokens for the given numbers
+    models.User.find({phoneNum: {$in: numbers}}, function(err, users) {
+        if(err | !users) {
+            console.log('cannot find users.');
+        }
+        else {
+            var tokens = [];
+            users.forEach(function(user) {
+                console.log(user.pushToken);
+                tokens.push(user.pushToken);
+            });
+            console.log('PUSH TOKENS:', tokens);
+            callback(tokens);
+        }
+    });
 
     // To test, replace this with the token in your browser console.
-    callback(['DEV-43bd86e6-4d68-42ff-993b-b18208b31e88']);
+    // callback(['DEV-43bd86e6-4d68-42ff-993b-b18208b31e88']);
+};
+
+
+var update_user = function(user_id, update_obj, callback) {
+    models.User.findById(user_id, function(err, user) {
+        if(err || !user) {
+            console.log('error:', err);
+        }
+        else {
+            user.uname = update_obj.uname || user.uname;
+            user.phoneNum = update_obj.phoneNum || user.phoneNum;
+            user.pushToken = update_obj.pushToken || user.pushToken;
+            user.save(function(err) {
+                if(err) {
+                    console.log('error', err);
+                }
+
+                if(callback) callback();
+            });
+        }
+    });
 };
 
 
@@ -179,7 +214,7 @@ module.exports = {
 
 
     get_user: function(req, res) {
-        var phone_no = req.params.phone_no;
+        var phone_no = req.query.phone_no;
         console.log('get user request ->', phone_no);
         if(!phone_no) {
             console.log('phone_no cannot be empty!');
@@ -194,17 +229,34 @@ module.exports = {
         }
     },
 
+    
+    update_user: function(req, res) {
+        var user_id = req.params.user_id;
+        console.log('put user request ->', user_id);
+        if(!user_id) {
+            console.log('user_id cannot be empty!');
+            res.sendStatus(400);
+        }
+        else {
+            update_user(user_id, req.body, function() {
+                console.log(user_id, 'is updated.');
+                res.sendStatus(200);
+            });
+        }
+    },
+
 
     new_topic: function(req, res) {
         //TODO: check request body and construct new topic. (new_topic func is defined)
         //      request body includes:  topic (what, where, desc), 
         //                              receivers
 
-        console.log('new_topic request: ' + JSON.stringify(req.body));
+        console.log('\nnew_topic request: ' + JSON.stringify(req.body));
 
         // Get user push tokens from db using the receivers phone numbers
         get_user_push_tokens(req.body.receivers, function (tokens) {
-            push.pushTopic(req.body.topic, tokens);
+            // Uncomment next line for push tests.
+            // push.pushTopic(req.body.topic, tokens);
             res.sendStatus(200);
         });
     },

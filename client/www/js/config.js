@@ -14,6 +14,10 @@ recommender.config(function($stateProvider, $urlRouterProvider, $ionicAppProvide
             templateUrl: 'templates/topic.html',
             controller: 'topicCtrl',
             params: {topic_id: null}
+        })
+        .state('newTopic', {
+            templateUrl: 'templates/new-topic.html',
+            controller: 'newTopicCtrl'
         });
 
     $ionicAppProvider.identify({

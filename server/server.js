@@ -35,9 +35,10 @@ router.get('/', function(req, res) {
 });
 
 
-app.route('/login/:phone_no?')
+app.route('/user/:user_id?')
     .get(db.get_user)
-    .post(db.new_user);
+    .post(db.new_user)
+    .put(db.update_user);
 
 // app.get('/login/:phone_no', db.get_user);
 // app.post('/login', db.new_user);

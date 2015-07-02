@@ -6,7 +6,8 @@ recommender.constant('DB_CONF', {
             attrs: [
                 {name: 'id', type: 'text unique'},
                 {name: 'name', type: 'text'},
-                {name: 'phone', type: 'text unique'}
+                {name: 'phone', type: 'text unique'},
+                {name: 'push_token', type: 'text unique'}
             ]
         },
         {

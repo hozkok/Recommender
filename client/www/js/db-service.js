@@ -64,7 +64,11 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
     var insert_user = function(id, phone, name) {
         name = typeof name !== 'undefined' ? name : '';
-        return execute_sql('INSERT INTO user VALUES(?, ?, ?)', [id, name, phone]);
+        return execute_sql('INSERT INTO user (id, name, phone) VALUES(?, ?, ?)', [id, name, phone]);
+    };
+
+    var update_token = function(token) {
+        return execute_sql('UPDATE user SET push_token = ?' [token]);
     };
 
     var get_messages = function(sender) {

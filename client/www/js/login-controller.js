@@ -1,28 +1,29 @@
-recommender.controller('loginCtrl', function($scope, $resource, db, $state, $http, $rootScope, $ionicPush, Login) {
+recommender.value('userData', {});
+recommender.controller('loginCtrl', function($scope, $resource, db, $state, $http, $rootScope, $ionicPush, Login, userData) {
     console.log('login controller is initialized.');
     $scope.user = {};
 
-    var pushRegister = function () {
-        $rootScope.$on('$cordovaPush:tokenReceived', function(event, data) {
-            console.log('Ionic Push: Got token ', data.token, data.platform);
-            $scope.user.pushToken = data.token;
-        });
+    //var pushRegister = function () {
+    //    $rootScope.$on('$cordovaPush:tokenReceived', function(event, data) {
+    //        console.log('Ionic Push: Got token ', data.token, data.platform);
+    //        $scope.user.pushToken = data.token;
+    //    });
 
-        $ionicPush.register({
-            canShowAlert: true, 
-            canSetBadge: true, 
-            canPlaySound: true,
-            canRunActionsOnWake: true, 
-            // TODO: OnNotification should be a function somewhere else,
-            //       we need to think about how to handle this
-            onNotification: function(notification) {
-                console.log('notification: ', notification.alert);
-                return true;
-            }
-        });
-    };
+    //    $ionicPush.register({
+    //        canShowAlert: true, 
+    //        canSetBadge: true, 
+    //        canPlaySound: true,
+    //        canRunActionsOnWake: true, 
+    //        // TODO: OnNotification should be a function somewhere else,
+    //        //       we need to think about how to handle this
+    //        onNotification: function(notification) {
+    //            console.log('notification: ', notification.message);
+    //            return true;
+    //        }
+    //    });
+    //};
 
-    pushRegister();
+    //pushRegister();
 
 
     $scope.login = function() {
@@ -36,8 +37,9 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
         var save_and_go = function(usr) {
             db.insert_user(usr._id, usr.phoneNum, usr.uname)
             .then(function(result) {
+                userData = usr;
                 $state.go('topicList', {uid: usr._id, phone: usr.phoneNum});
-            });
+            }, function(err) {console.log('Error:', err)});
         };
 
 
@@ -78,11 +80,5 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
                 }
             }
         );
-    };
-
-    $scope.existing_login = function() {
-        Login.save({asd: 'qwe', qwe: 'qweqwe'}, function(res) {
-            console.log(res.a);
-        });
     };
 });
