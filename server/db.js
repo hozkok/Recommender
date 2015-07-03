@@ -53,7 +53,7 @@ var get_user = function(phone, process_user) {
 };
 
 
-var new_topic = function(attrs) {
+var new_topic = function(attrs, callback, err_callback) {
     if(!attrs.owner || !attrs.what) {
         console.log('topic owner and what attrs cannot be empty.');
     }
@@ -62,10 +62,11 @@ var new_topic = function(attrs) {
         var topic = new models.Topic(attrs);
         topic.save(function(err) {
             if(err) {
-                console.log('new_topic error:', err);
+                err_callback(err);
             }
             else {
                 console.log('topic:', attrs.what, 'successfully saved into db.');
+                callback();
             }
         });
     }
@@ -139,7 +140,7 @@ var new_message = function(topic_id, sender_id, text) {
 
 var get_topic_list = function(usr_id, callback) {
     models.Topic
-        .find({owner: usr_id})
+        .find({$or: [{owner: usr_id}, {participants: usr_id}]})
         .populate('owner')
         .exec(function(err, topics) {
             if(err || !topics) {
@@ -156,20 +157,23 @@ var get_topic_list = function(usr_id, callback) {
         });
 };
 
+// return: array of objects [{ _id, pushToken }]
 var get_user_push_tokens = function (numbers, callback) {
     // TODO: find and return the pushTokens for the given numbers
-    models.User.find({phoneNum: {$in: numbers}}, function(err, users) {
+    models.User.find({phoneNum: {$in: numbers}}).select('pushToken')
+    .exec(function(err, users) {
         if(err | !users) {
             console.log('cannot find users.');
         }
         else {
-            var tokens = [];
-            users.forEach(function(user) {
-                console.log(user.pushToken);
-                tokens.push(user.pushToken);
-            });
-            console.log('PUSH TOKENS:', tokens);
-            callback(tokens);
+            callback(users);
+            //var tokens = [];
+            //users.forEach(function(user) {
+            //    console.log(user.pushToken);
+            //    tokens.push(user.pushToken);
+            //});
+            //console.log('PUSH TOKENS:', tokens);
+            //callback(tokens);
         }
     });
 
@@ -248,16 +252,30 @@ module.exports = {
 
     new_topic: function(req, res) {
         //TODO: check request body and construct new topic. (new_topic func is defined)
-        //      request body includes:  topic (what, where, desc), 
-        //                              receivers
+        //      request body includes:  what, where, desc, 
+        //                              owner,
+        //                              participants: []
 
+        var topic = req.body;
         console.log('\nnew_topic request: ' + JSON.stringify(req.body));
 
         // Get user push tokens from db using the receivers phone numbers
-        get_user_push_tokens(req.body.receivers, function (tokens) {
+        // return: array of objects [{ _id, pushToken }]
+        get_user_push_tokens(topic.participants, function (users) {
             // Uncomment next line for push tests.
-            // push.pushTopic(req.body.topic, tokens);
-            res.sendStatus(200);
+            // push.pushTopic(topic, users.map(function(user) {return user.pushToken}));
+            console.log(users);
+
+            topic.participants = users.map(function(user) {return user._id});
+            new_topic(topic, 
+                //success
+                function() {
+                    res.sendStatus(200);
+                }, function(err) {
+                    console.log('new_topic error:', err);
+                    res.sendStatus(500);
+                }
+            );
         });
     },
 

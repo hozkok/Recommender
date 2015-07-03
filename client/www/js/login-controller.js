@@ -37,7 +37,7 @@ recommender.controller('loginCtrl', function($scope, $resource, db, $state, $htt
         var save_and_go = function(usr) {
             db.insert_user(usr._id, usr.phoneNum, usr.uname)
             .then(function(result) {
-                userData = usr;
+                angular.extend(userData, usr);
                 $state.go('topicList', {uid: usr._id, phone: usr.phoneNum});
             }, function(err) {console.log('Error:', err)});
         };

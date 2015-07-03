@@ -18,9 +18,11 @@
                 <textarea type="text" rows="4" style="resize: none;" placeholder="Description" ng-model="topic.description"></textarea>
             </label>
             <label class="item">
-                <button class="button button-positive" ng-click="show_participants()">Select Participants</button>
+                <button class="button button-clear button-positive" ng-click="show_participants()">
+                    <i class="icon ion-android-contacts" style="padding-right: 15px;"></i>Select Participants
+                </button>
             </label>
-            <button class="item button button-block button-balanced" style="margin: 10px auto 0 auto; width: 75%;">Create Topic</button>
+            <button class="item button button-block button-balanced" style="margin: 10px auto 0 auto; width: 75%;" ng-click="save_topic()">Create Topic</button>
         </div>
     </ion-content>
 </ion-view>
