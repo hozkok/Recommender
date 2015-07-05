@@ -11,3 +11,7 @@ recommender.factory('Login', ['$resource', function($resource) {
 recommender.factory('Topic', ['$resource', function($resource) {
     return $resource('http://localhost:9000/topic/:topic_id');
 }]);
+
+recommender.factory('Message', ['$resource', function($resource) {
+    return $resource('http://localhost:9000/message');
+}]);

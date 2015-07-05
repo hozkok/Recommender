@@ -20,5 +20,30 @@
                 <p>{{topic.description}}</p>
             </ion-item>
         </ion-list>
+
+        <div class="list card">
+            <div class="item item-divider">
+                Messages
+            </div>
+            <div class="item" ng-repeat="msg in topic.messages">
+                <h2>{{msg.sender.uname}}</h2>
+                <span class="item-note">{{msg.date | date: 'yyyy/MM/dd h:mma'}}</span>
+                {{msg.text}}
+            </div>
+        </div>
     </ion-content>
+
+    <form name="sendMessageForm" ng-submit="send_message()" novalidate>
+        <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach
+        style="overflow: visible !important;">
+            <label class="item-input-wrapper" style="background-color: #f4f4f4 !important;">
+                <textarea ng-model="message" value="" placeholder="Give an advice..." required minlength="1" maxlength="1500" msd-elastic style="resize: none; height: 25px; background-color: #f4f4f4 !important; width: 100%;"></textarea>
+            </label>
+            <div class="footer-btn-wrap" style="position: relative; height: 100%; width: 50px; top: 7px;">
+                <button class="button button-icon icon ion-android-send footer-btn" type="submit" style="padding-top: 2px; position: absolute !important; bottom: 0;"
+                ng-disabled="!message">
+                </button>
+            </div>
+        </ion-footer-bar>
+    </form>
 </ion-view>

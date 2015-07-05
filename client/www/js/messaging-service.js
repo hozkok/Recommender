@@ -1,4 +1,4 @@
-recommender.factory('Messaging', ['$ionicPush', '$rootScope', 'db', 'Login', 'userData',
+recommender.factory('PushService', ['$ionicPush', '$rootScope', 'db', 'Login', 'userData',
 function($ionicPush, $rootScope, db, Login, userData) {
     var pushToken, platform;
 
@@ -23,7 +23,7 @@ function($ionicPush, $rootScope, db, Login, userData) {
         }
     };
 
-    console.log('Messaging is initialized successfully.');
+    console.log('PushService is initialized successfully.');
 
     return {
         register: function() {

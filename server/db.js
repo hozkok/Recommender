@@ -30,9 +30,18 @@ var get_topic = function(topic_id, process_topic) {
                 console.log('couldn\'t get the topic ->', topic_id);
             }
             else {
-                process_topic(topic);
+                models.Message.populate(topic.messages, {
+                    path: 'sender',
+                    select: 'uname -_id'
+                }, function(err, result) {
+                    if(err) {
+                        console.log('Error when getting message senders\' details.');
+                    }
+                    console.log(result);
+                    process_topic(topic);
+                });
             }
-        })
+        });
 };
 
 
@@ -106,29 +115,43 @@ var new_user = function(name, phone, callback) {
 //};
 
 
-var new_message = function(topic_id, sender_id, text) {
+var new_message = function(msgObj, success_callback, err_callback) {
     models.Topic
-        .findOne({_id: new ObjectId(topic_id)})
-        .populate('messages')
+        .findById(msgObj.topic_id)
         .exec(function(err, topic) {
             if(err || !topic) {
                 console.log('error when finding topic!');
+                err_callback(err);
             }
             else {
                 var msg = models.Message({
-                    sender: new ObjectId(sender_id),
-                    text: text
+                    sender: new ObjectId(msgObj.sender_id),
+                    text: msgObj.text
                 });
                 msg.save(function(err, msg) {
-                    if(err) console.log(err);
+                    if(err) {
+                        console.log('couldn\'t save the message.');
+                        err_callback(err);
+                    }
                     else {
                         topic.messages.push(msg);
                         topic.save(function(err) {
                             if(err) {
                                 console.log('couldn\'t add message on this topic.');
+                                err_callback(err);
                             }
                             else {
-                                console.log('message added successfully.');
+                                models.Message.populate(msg, {
+                                    path: 'sender',
+                                    select: 'uname -_id'
+                                }, function(err, result) {
+                                    if(err) {
+                                        err_callback(err);
+                                    }
+                                    else {
+                                        success_callback(msg);
+                                    }
+                                });
                             }
                         })
                     }
@@ -282,6 +305,22 @@ module.exports = {
 
     new_message: function(req, res) {
         //TODO: insert new message on topic. (new_message func is defined)
+        console.log('new_message req:', req.body);
+        if(!req.body.text || !req.body.sender_id || !req.body.topic_id)
+            res.sendStatus(400);
+        else {
+            new_message(req.body,
+                //success
+                function(result) {
+                    console.log('message added successfully.');
+                    res.json(result)
+                },
+                //error
+                function(err) {
+                    res.sendStatus(500);
+                }
+            );
+        }
     },
 
     

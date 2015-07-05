@@ -1,5 +1,6 @@
-recommender.controller('topicListCtrl', ['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'Messaging', '$ionicPopover',
-function($scope, $state, userData, $resource, db, Topics, Messaging, $ionicPopover) {
+recommender.controller('topicListCtrl',
+['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover',
+function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover) {
     console.log('topicListCtrl is initialized successfully.');
     console.log('topicListCtrl uid param:', userData._id);
 
@@ -47,7 +48,7 @@ function($scope, $state, userData, $resource, db, Topics, Messaging, $ionicPopov
     //         }
     //     );
     // };
-    // Messaging.register().then(function() {
+    // PushService.register().then(function() {
     //     $scope.push();
     // });
     // ================== TEST CODE (Remove) =====================
@@ -55,18 +56,53 @@ function($scope, $state, userData, $resource, db, Topics, Messaging, $ionicPopov
 }]);
 
 
-recommender.controller('topicCtrl', ['$scope', '$state', '$stateParams', '$resource', '$ionicHistory', 'db', 'Topic',
-function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic) {
+recommender.controller('topicCtrl', 
+['$scope', '$state', '$stateParams', '$resource', '$ionicHistory', 'db', 'Topic', 'userData', 'Message',
+function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, userData, Message) {
     console.log('topicCtrl is initialized successfully.');
     console.log('topic id:', $stateParams.topic_id);
+    var footer = document.body.querySelector('.message-footer');
+    $scope.message = '';
+
     Topic.get({topic_id: $stateParams.topic_id}, function(topic) {
         console.log('topic ->', topic);
         $scope.topic = topic;
     });
     $scope.go_back = $ionicHistory.goBack;
+
+    $scope.$on('elastic:height-changed', function(event, msgHeight) {
+        if(!msgHeight) return;
+
+        if(!footer) {
+            console.log('error: couldn\'t get footer.');
+            return;
+        }
+        footer.style.height = ((msgHeight > 34) ? msgHeight : 34) + 10 + 'px';
+    });
+
+    $scope.send_message = function() {
+        var msg = {
+            text: $scope.message,
+            sender_id: userData._id,
+            topic_id: $stateParams.topic_id
+        };
+        Message.save(msg)
+        .$promise.then(
+            //success
+            function(msg) {
+                console.log('message is successfully sent to the server.');
+                $scope.topic.messages.push(msg);
+                $scope.message = '';
+            },
+            //error
+            function(err) {
+                console.log('error: message could not be sent ->', err);
+            });
+    };
 }]);
 
-recommender.controller('newTopicCtrl', ['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state',
+recommender.controller('newTopicCtrl',
+['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state',
 function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state) {
     var participants = [];
     $scope.topic = {};

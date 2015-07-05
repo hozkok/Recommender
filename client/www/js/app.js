@@ -7,4 +7,5 @@ var recommender = angular.module('starter', ['ionic',
 	'ngCordova', 
 	'ngResource',
 	'ionic.service.core',
-  	'ionic.service.push' ]);
+  	'ionic.service.push',
+    'monospaced.elastic']);

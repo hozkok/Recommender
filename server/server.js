@@ -52,6 +52,10 @@ app.route('/topic/:topic_id?')
     .get(db.get_topic);
 
 
+app.route('/message')
+    .post(db.new_message);
+
+
 app.use('/api', router);
 
 // app.route('/login')
