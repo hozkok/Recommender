@@ -304,7 +304,6 @@ module.exports = {
 
 
     new_message: function(req, res) {
-        //TODO: insert new message on topic. (new_message func is defined)
         console.log('new_message req:', req.body);
         if(!req.body.text || !req.body.sender_id || !req.body.topic_id)
             res.sendStatus(400);
@@ -333,7 +332,6 @@ module.exports = {
 
 
     get_topic: function(req, res) {
-        //TODO: get requested topic and send a response. (get_topic func is defined, use it)
         var topic_id = req.params.topic_id;
         if(!topic_id) {
             res.sendStatus(400);

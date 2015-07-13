@@ -1,17 +1,22 @@
-recommender.factory('Topics', ['$resource', function($resource) {
-    return $resource('http://localhost:9000/topics/:user_id');
+recommender.constant('BACKEND', {
+    //url: 'http://46.101.24.174:9000'
+    url: 'http://localhost:9000'
+});
+
+recommender.factory('Topics', ['$resource', 'BACKEND', function($resource, BACKEND) {
+    return $resource(BACKEND.url + '/topics/:user_id');
 }]);
 
-recommender.factory('Login', ['$resource', function($resource) {
-    return $resource('http://localhost:9000/user/:user_id', null, {
+recommender.factory('Login', ['$resource', 'BACKEND', function($resource, BACKEND) {
+    return $resource(BACKEND.url + '/user/:user_id', null, {
         'update': {method: 'PUT'}
     });
 }]);
 
-recommender.factory('Topic', ['$resource', function($resource) {
-    return $resource('http://localhost:9000/topic/:topic_id');
+recommender.factory('Topic', ['$resource', 'BACKEND', function($resource, BACKEND) {
+    return $resource(BACKEND.url + '/topic/:topic_id');
 }]);
 
-recommender.factory('Message', ['$resource', function($resource) {
-    return $resource('http://localhost:9000/message');
+recommender.factory('Message', ['$resource', 'BACKEND', function($resource, BACKEND) {
+    return $resource(BACKEND.url + '/message');
 }]);
