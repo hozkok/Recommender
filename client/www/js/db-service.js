@@ -13,7 +13,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
             tx.executeSql('CREATE TABLE IF NOT EXISTS ' + table.name +
                 '(' + attrs.join(',') + ')');
         });
-    }
+    };
 
     var init_db = function() {
         var db_prep = typeof(cordova) !== 'undefined' ? 
@@ -27,11 +27,11 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
             },//success
             function() {
                 console.log('db is initialized successfully!');
-                async_db.resolve(db_prep);
                 db = db_prep;
+                async_db.resolve(db_prep);
             }
         );
-    }
+    };
 
     function execute_sql(query, params) {
         params = (typeof(params) !== 'undefined') ? params : [];
@@ -56,7 +56,47 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         }
 
         return async_result.promise;
-    }
+    };
+
+
+    function exec_multiple_sql(query, data_arr) {
+        var len = data_arr.length;
+        var async_result = $q.defer();
+
+        var transaction_completed = function() {
+            var queries_completed = 0;
+            return function() {
+                queries_completed++;
+                return queries_completed === len;
+            };
+        }();
+
+        var exec_queries = function(db) {
+            db.transaction(function(tx) {
+                var results = [];
+                for(var i=0; i < len; i++) {
+                    tx.executeSql(query, data_arr[i], function(tx, result) {
+                        results.push(result);
+                        if(transaction_completed())
+                            async_result.resolve(results);
+                    }, function(tx, err) {
+                        console.log('something is wrong...');
+                        async_result.reject(err);
+                    });
+                }
+            });
+        };
+        
+        async_db.promise.then(
+            //success
+            exec_queries,
+            //error
+            function(err) {
+                console.log('cannot reach to db:', err);
+            }
+        );
+    };
+
 
     var get_user_data = function() {
         return execute_sql('SELECT * FROM user');
@@ -71,28 +111,19 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return execute_sql('UPDATE user SET push_token = ?' [token]);
     };
 
-    var get_messages = function(sender) {
-        var query = 'SELECT * FROM message WHERE sender=?';
-        return execute_sql(query, [sender]);
-    }
+    var get_messages = function(topic_id) {
+        var query = 'SELECT * FROM messages WHERE topic_id=?';
+        return execute_sql(query, [topic_id]);
+    };
+
+    var save_messages = function(topic_id, messages) {
+        var query = 'INSERT INTO messages (topic_id, sender, text, date) VALUES(?, ?, ?, ?)';
+    };
 
     return {
         init: init_db,
         get_user_data: get_user_data,
-        insert_user: insert_user
+        insert_user: insert_user,
+        get_messages: get_messages
     };
 }]);
-
-
-
-
-
- //recommender.controller('db', function($scope, $cordovaSQLite) {
- //    var db = $cordovaSQLite.openDB({name: 'recommend.db', dbType: 1});
- //    var query = 'INSERT INTO test (test_data) VALUES (?)';
- //    $cordovaSQLite.execute(db, query, ['testing...']).then(function(res) {
- //        console.log('insert id: ' + res.insertId);
- //    }, function(err) {
- //        console.log('Error: ' + err);
- //    });
- //});

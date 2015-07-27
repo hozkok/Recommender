@@ -102,8 +102,8 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
 }]);
 
 recommender.controller('newTopicCtrl',
-['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state',
-function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state) {
+['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService',
+function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService) {
     var participants = [];
     $scope.topic = {};
     $scope.go_back = $ionicHistory.goBack;
@@ -116,6 +116,9 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state) {
         {name: 'TestUser2', phoneNum: '0872345678'}
     ];
 
+    // set destruct timer to 7 days by default
+    $scope.topic.destruct_date = 7;
+    
 
     $scope.show_participants = function() {
         $ionicPopup.show({
@@ -132,6 +135,7 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state) {
             }]
         });
     };
+
 
     $scope.save_topic = function() {
         if(participants.length === 0) {
@@ -156,7 +160,8 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state) {
             what: $scope.topic.what,
             where: $scope.topic.where,
             description: $scope.topic.description,
-            participants: participants.map(function(p) {return p.phoneNum;})
+            participants: participants.map(function(p) {return p.phoneNum;}),
+            destruct_date: $scope.topic.destruct_date
         };
 
         Topics.save(topic)
@@ -169,6 +174,16 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state) {
             //error
             function() {
                 console.log('An error occured during sending new topic.');
+            }
+        );
+    };
+
+
+    $scope.search = function() {
+        LocationService.find_locations($scope.topic.what)
+        .then(
+            function(locs) {
+                console.log(locs);
             }
         );
     };

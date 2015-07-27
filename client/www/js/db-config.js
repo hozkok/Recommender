@@ -11,7 +11,7 @@ recommender.constant('DB_CONF', {
             ]
         },
         {
-            name: 'friends',
+            name: 'contacts',
             attrs: [
                 {name: 'name', type: 'text'},
                 {name: 'phone', type: 'text unique'}
@@ -30,6 +30,7 @@ recommender.constant('DB_CONF', {
         {
             name: 'messages',
             attrs: [
+                {name: 'topic_id', type: 'text'},
                 {name: 'text', type: 'text'},
                 {name: 'sender', type: 'text'},
                 {name: 'date', type: 'datetime'}

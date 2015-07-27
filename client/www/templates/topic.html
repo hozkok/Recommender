@@ -15,20 +15,20 @@
                 <h2>Where</h2>
                 <p>{{topic.where}}</p>
             </ion-item>
-            <ion-item>
+            <ion-item class="item-text-wrap">
                 <h2>Description</h2>
                 <p>{{topic.description}}</p>
             </ion-item>
         </ion-list>
 
-        <div class="list card">
-            <div class="item item-divider">
-                Messages
-            </div>
-            <div class="item" ng-repeat="msg in topic.messages">
-                <h2>{{msg.sender.uname}}</h2>
-                <span class="item-note">{{msg.date | date: 'yyyy/MM/dd h:mma'}}</span>
+        <h4 class="title" style="text-align: center;">
+            Messages
+        </h4>
+
+        <div ng-repeat="msg in topic.messages">
+            <div class="card item item-text-wrap stable-bg">
                 {{msg.text}}
+                <span class="item-note">{{msg.sender.uname + ' - ' + (msg.date | date: 'yyyy/MM/dd h:mma')}}</span>
             </div>
         </div>
     </ion-content>
