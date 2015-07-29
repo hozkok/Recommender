@@ -17,7 +17,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
     var init_db = function() {
         var db_prep = typeof(cordova) !== 'undefined' ? 
-            $cordovaSQLite.openDB({name: DB_CONF.name}) :
+            $cordovaSQLite.openDB(DB_CONF.name) :
             window.openDatabase(DB_CONF.name, '1.0', 'Development db', 10*1024*1024); 
         db_prep.transaction(populate_db,
             //err
