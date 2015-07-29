@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/zeawee/csdev/Recommender/client/platforms/android/libs/sqlite-connector.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="74cbd33faef2706f8fd2c2677cde8b63621b42d3">
+        <dex dex="/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/sqlite-connector-9fba91ba38b36eb15f8d5638c6beb181042df421.jar" />
+    </item>
+    <item
+        jar="/home/zeawee/csdev/Recommender/client/platforms/android/libs/sqlite-native-driver.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="21e1864f4da0a023b711602fd7ac6d15cfb5f2c7">
+        <dex dex="/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/sqlite-native-driver-757b946e2d2e74f513a742c79572c55f763efe5b.jar" />
+    </item>
+    <item
+        jar="/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/exploded-aar/android/CordovaLib/unspecified/debug/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="9b5c17eb7867075b8db62c4da5271e7f0f712470">
+        <dex dex="/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/classes-59ccab1c624bbc031dfedfcd91d4c37866ef66b0.jar" />
+    </item>
+
+</items>

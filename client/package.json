@@ -17,13 +17,9 @@
   "cordovaPlugins": [
     "cordova-plugin-device",
     "cordova-plugin-console",
-    "cordova-plugin-splashscreen",
-    "com.ionic.keyboard",
     "cordova-plugin-whitelist",
-    {
-      "locator": "https://github.com/phonegap-build/PushPlugin.git",
-      "id": "com.phonegap.plugins.PushPlugin"
-    }
+    "cordova-plugin-splashscreen",
+    "com.ionic.keyboard"
   ],
   "cordovaPlatforms": [
     "android"

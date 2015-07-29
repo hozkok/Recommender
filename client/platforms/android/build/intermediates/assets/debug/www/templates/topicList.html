@@ -1,0 +1,25 @@
+<ion-view view-title="Topics">
+    <ion-nav-buttons>
+        <button class="button button-icon icon ion-navicon" ng-click="open_popover($event)"></button>
+    </ion-nav-buttons>
+
+    <ion-content>
+        <ion-list>
+            <ion-item class="item" ng-repeat="topic in topics" ui-sref="topic({topic_id: topic._id})">
+                <h2>{{topic.what}}<h2>
+                <p>{{topic.owner.uname}}</p>
+                <span class="item-note">
+                    {{topic.date | date: 'yyyy/MM/dd h:mma'}}
+                    </br>
+                    Destruct Date: {{topic.destruct_date | date: 'yyyy/MM/dd'}}
+                </span>
+            </ion-item>
+        </ion-list>
+        <!-- <div class="list">
+            <a class="item" ng-repeat="topic in topics" ui-sref="topic({topic_id: topic._id})">
+                <h2>{{topic.what}}<h2>
+                <p>{{topic.owner.uname}}</p>
+            </a>
+        </div> -->
+    </ion-content>
+</ion-view>
