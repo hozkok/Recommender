@@ -14,7 +14,7 @@ recommender.constant('DB_CONF', {
             name: 'contacts',
             attrs: [
                 {name: 'name', type: 'text'},
-                {name: 'phone', type: 'text unique'}
+                {name: 'phone', type: 'text'}
             ]
         },
         {

@@ -1,8 +1,27 @@
 recommender.controller('topicListCtrl',
-['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover',
-function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover) {
+['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover', '$cordovaContacts',
+function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover, $cordovaContacts) {
     console.log('topicListCtrl is initialized successfully.');
     console.log('topicListCtrl uid param:', userData._id);
+
+    $cordovaContacts.find({filter: '', multiple: true})
+    .then(function(contacts) {
+        console.log(contacts);
+        var contacts_with_phone = contacts
+            .filter(function(contact) {
+                return contact.phoneNumbers != null;
+            })
+            .map(function(contact) {
+                return {
+                    phoneNumbers: contact.phoneNumbers.map(
+                                      function(phoneNumber) {
+                                          return phoneNumber.value;
+                                      }),
+                    name: contact.displayName
+                };
+            });
+        console.log(contacts_with_phone);
+    });
 
 
     Topics.query({user_id: userData._id}, function(topics) {

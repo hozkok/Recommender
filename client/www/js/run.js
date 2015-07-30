@@ -20,14 +20,14 @@ recommender.run(['$ionicPlatform', 'db', '$state', 'userData', function($ionicPl
                 $state.go('login');
             }
             else {
-                console.log('result:', result.rows[0]);
-                userData._id = result.rows[0].id;
-                userData.phoneNum = result.rows[0].phone;
-                userData.name = result.rows[0].name;
+                console.log('result:', result);
+                userData._id = result.rows.item(0).id;
+                userData.phoneNum = result.rows.item(0).phone;
+                userData.name = result.rows.item(0).name;
 
                 $state.go('topicList', {
-                    phone: result.rows[0].phone,
-                    uid: result.rows[0].id}
+                    phone: result.rows.item(0).phone,
+                    uid: result.rows.item(0).id}
                 );
             }
         });

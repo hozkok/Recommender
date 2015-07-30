@@ -226,6 +226,11 @@ var update_user = function(user_id, update_obj, callback) {
 };
 
 
+//TODO: get all contacts of the user
+var get_contact_list = function(user_id) {
+};
+
+
 module.exports = {
     connect: function() {
         mongoose.connect('mongodb://localhost/recommender');

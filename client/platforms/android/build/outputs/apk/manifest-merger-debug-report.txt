@@ -41,6 +41,7 @@ ADDED from AndroidManifest.xml:6:5
 		ADDED from AndroidManifest.xml:6:22
 application
 ADDED from AndroidManifest.xml:7:5
+MERGED from com.android.support:support-v4:22.1.1:22:5
 	android:label
 		ADDED from AndroidManifest.xml:7:83
 	android:supportsRtl
@@ -75,10 +76,75 @@ category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:11:17
 	android:name
 		ADDED from AndroidManifest.xml:11:27
+activity#com.plugin.gcm.PushHandlerActivity
+ADDED from AndroidManifest.xml:14:9
+	android:exported
+		ADDED from AndroidManifest.xml:14:19
+	android:name
+		ADDED from AndroidManifest.xml:14:43
+receiver#com.plugin.gcm.CordovaGCMBroadcastReceiver
+ADDED from AndroidManifest.xml:15:9
+	android:permission
+		ADDED from AndroidManifest.xml:15:77
+	android:name
+		ADDED from AndroidManifest.xml:15:19
+intent-filter#com.google.android.c2dm.intent.RECEIVE+com.google.android.c2dm.intent.REGISTRATION+com.ionicframework.client730495
+ADDED from AndroidManifest.xml:16:13
+action#com.google.android.c2dm.intent.RECEIVE
+ADDED from AndroidManifest.xml:17:17
+	android:name
+		ADDED from AndroidManifest.xml:17:25
+action#com.google.android.c2dm.intent.REGISTRATION
+ADDED from AndroidManifest.xml:18:17
+	android:name
+		ADDED from AndroidManifest.xml:18:25
+category#com.ionicframework.client730495
+ADDED from AndroidManifest.xml:19:17
+	android:name
+		ADDED from AndroidManifest.xml:19:27
+service#com.plugin.gcm.GCMIntentService
+ADDED from AndroidManifest.xml:22:9
+	android:name
+		ADDED from AndroidManifest.xml:22:18
 uses-sdk
-ADDED from AndroidManifest.xml:15:5
+ADDED from AndroidManifest.xml:24:5
+MERGED from com.android.support:support-v4:22.1.1:20:5
 MERGED from android:CordovaLib:unspecified:debug:25:5
 	android:targetSdkVersion
-		ADDED from AndroidManifest.xml:15:42
+		ADDED from AndroidManifest.xml:24:42
 	android:minSdkVersion
-		ADDED from AndroidManifest.xml:15:15
+		ADDED from AndroidManifest.xml:24:15
+uses-permission#android.permission.GET_ACCOUNTS
+ADDED from AndroidManifest.xml:25:5
+	android:name
+		ADDED from AndroidManifest.xml:25:22
+uses-permission#android.permission.WAKE_LOCK
+ADDED from AndroidManifest.xml:26:5
+	android:name
+		ADDED from AndroidManifest.xml:26:22
+uses-permission#android.permission.VIBRATE
+ADDED from AndroidManifest.xml:27:5
+	android:name
+		ADDED from AndroidManifest.xml:27:22
+uses-permission#com.google.android.c2dm.permission.RECEIVE
+ADDED from AndroidManifest.xml:28:5
+	android:name
+		ADDED from AndroidManifest.xml:28:22
+permission#com.ionicframework.client730495.permission.C2D_MESSAGE
+ADDED from AndroidManifest.xml:29:5
+	android:protectionLevel
+		ADDED from AndroidManifest.xml:29:87
+	android:name
+		ADDED from AndroidManifest.xml:29:17
+uses-permission#com.ionicframework.client730495.permission.C2D_MESSAGE
+ADDED from AndroidManifest.xml:30:5
+	android:name
+		ADDED from AndroidManifest.xml:30:22
+uses-permission#android.permission.READ_CONTACTS
+ADDED from AndroidManifest.xml:31:5
+	android:name
+		ADDED from AndroidManifest.xml:31:22
+uses-permission#android.permission.WRITE_CONTACTS
+ADDED from AndroidManifest.xml:32:5
+	android:name
+		ADDED from AndroidManifest.xml:32:22

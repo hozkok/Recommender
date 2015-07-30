@@ -71,18 +71,34 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
             };
         }();
 
+        var generate_callback = function(cb_type) {
+            var resolved = {results: [], errors: []};
+
+            switch(cb_type) {
+                case 'error':
+                    return function(tx, err) {
+                        resolved.errors.push(err);
+                        if(transaction_completed())
+                            async_result.resolve(resolved);
+
+                    }
+                case 'success':
+                    return function(tx, result) {
+                        resolved.results.push(result);
+                        if(transaction_completed())
+                            async_result.resolve(resolved);
+                    }
+                default:
+                    throw 'ERROR: bad callback type!';
+            }
+        };
+
         var exec_queries = function(db) {
             db.transaction(function(tx) {
-                var results = [];
                 for(var i=0; i < len; i++) {
-                    tx.executeSql(query, data_arr[i], function(tx, result) {
-                        results.push(result);
-                        if(transaction_completed())
-                            async_result.resolve(results);
-                    }, function(tx, err) {
-                        console.log('something is wrong...');
-                        async_result.reject(err);
-                    });
+                    tx.executeSql(query, data_arr[i],
+                        generate_callback('success'),
+                        generate_callback('error'));
                 }
             });
         };
@@ -95,6 +111,8 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
                 console.log('cannot reach to db:', err);
             }
         );
+
+        return async_result.promise;
     };
 
 
@@ -118,6 +136,11 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
     var save_messages = function(topic_id, messages) {
         var query = 'INSERT INTO messages (topic_id, sender, text, date) VALUES(?, ?, ?, ?)';
+    };
+
+    var save_contacts = function(contacts) {
+        var query = 'INSERT INTO contacts (name, phone) VALUES(?, ?)';
+        exec_multiple_sql(query, contacts);
     };
 
     return {
