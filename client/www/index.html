@@ -5,7 +5,8 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
 
     <!-- custom meta -->
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+    <!--meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"-->
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
 
     <title></title>
 
@@ -39,6 +40,7 @@
     <script src="js/resource-service.js"></script>
     <script src="js/messaging-service.js"></script>
     <script src="js/location-service.js"></script>
+    <script src="js/contact-service.js"></script>
     <script src="js/login-controller.js"></script>
     <script src="js/topic-controller.js"></script>
     <script src="js/run.js"></script>

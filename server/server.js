@@ -56,6 +56,11 @@ app.route('/message')
     .post(db.new_message);
 
 
+app.route('/contacts/:usr_id?')
+    .post(db.get_contact_list)
+    .get(db.get_contact_list);
+
+
 app.use('/api', router);
 
 // app.route('/login')

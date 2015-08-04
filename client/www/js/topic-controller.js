@@ -1,28 +1,8 @@
 recommender.controller('topicListCtrl',
-['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover', '$cordovaContacts',
-function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover, $cordovaContacts) {
+['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover',
+function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover) {
     console.log('topicListCtrl is initialized successfully.');
     console.log('topicListCtrl uid param:', userData._id);
-
-    $cordovaContacts.find({filter: '', multiple: true})
-    .then(function(contacts) {
-        console.log(contacts);
-        var contacts_with_phone = contacts
-            .filter(function(contact) {
-                return contact.phoneNumbers != null;
-            })
-            .map(function(contact) {
-                return {
-                    phoneNumbers: contact.phoneNumbers.map(
-                                      function(phoneNumber) {
-                                          return phoneNumber.value;
-                                      }),
-                    name: contact.displayName
-                };
-            });
-        console.log(contacts_with_phone);
-    });
-
 
     Topics.query({user_id: userData._id}, function(topics) {
         console.log(topics);
@@ -121,8 +101,8 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
 }]);
 
 recommender.controller('newTopicCtrl',
-['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService',
-function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService) {
+['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService', 'Contacts',
+function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService, Contacts) {
     var participants = [];
     $scope.topic = {};
     $scope.go_back = $ionicHistory.goBack;
@@ -130,10 +110,13 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
 
 
     //TODO: assign this to real user contacts later...
-    $scope.contacts = [
-        {name: 'TestUser', phoneNum: '0871234567'},
-        {name: 'TestUser2', phoneNum: '0872345678'}
-    ];
+    //$scope.contacts = [
+    //    {name: 'TestUser', phoneNum: '0871234567'},
+    //    {name: 'TestUser2', phoneNum: '0872345678'}
+    //];
+    Contacts.then(function(contacts) {
+        $scope.contacts = contacts;
+    });
 
     // set destruct timer to 7 days by default
     $scope.topic.destruct_date = 7;

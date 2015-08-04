@@ -60,45 +60,40 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
 
     function exec_multiple_sql(query, data_arr) {
-        var len = data_arr.length;
         var async_result = $q.defer();
 
         var transaction_completed = function() {
-            var queries_completed = 0;
+            var queries_completed = 0,
+                len = data_arr.length;
+
             return function() {
                 queries_completed++;
                 return queries_completed === len;
             };
         }();
 
-        var generate_callback = function(cb_type) {
+        var generate_callback = function() {
             var resolved = {results: [], errors: []};
+            var result_type = {'success': 'results', 'error': 'errors'};
 
-            switch(cb_type) {
-                case 'error':
-                    return function(tx, err) {
-                        resolved.errors.push(err);
-                        if(transaction_completed())
-                            async_result.resolve(resolved);
-
-                    }
-                case 'success':
-                    return function(tx, result) {
-                        resolved.results.push(result);
-                        if(transaction_completed())
-                            async_result.resolve(resolved);
-                    }
-                default:
+            return function(cb_type) {
+                if(cb_type !== 'success' || cb_type !== 'error')
                     throw 'ERROR: bad callback type!';
-            }
-        };
+
+                return function(tx, result) {
+                    resolved[result_type[cb_type]].push(result);
+                    if(transaction_completed())
+                        async_result.resolve(resolved);
+                };
+            };
+        }();
 
         var exec_queries = function(db) {
             db.transaction(function(tx) {
-                for(var i=0; i < len; i++) {
+                for(var i = 0; i < data_arr.length; i++) {
                     tx.executeSql(query, data_arr[i],
-                        generate_callback('success'),
-                        generate_callback('error'));
+                                  generate_callback('success'),
+                                  generate_callback('error'));
                 }
             });
         };
@@ -134,8 +129,9 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return execute_sql(query, [topic_id]);
     };
 
-    var save_messages = function(topic_id, messages) {
+    var save_messages = function(messages) {
         var query = 'INSERT INTO messages (topic_id, sender, text, date) VALUES(?, ?, ?, ?)';
+        exec_multiple_sql(query, messages);
     };
 
     var save_contacts = function(contacts) {
@@ -147,6 +143,8 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         init: init_db,
         get_user_data: get_user_data,
         insert_user: insert_user,
-        get_messages: get_messages
+        get_messages: get_messages,
+        save_contacts: save_contacts,
+        save_messages: save_messages
     };
 }]);

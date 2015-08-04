@@ -226,8 +226,38 @@ var update_user = function(user_id, update_obj, callback) {
 };
 
 
+var check_contacts = function(user_id, contactList, callback) {
+    models.User.find({phoneNum: {'$in': contactList}}, function(err, users) {
+        var options = {multi: false},
+            query = {_id: user_id},
+            update = {contacts: users};
+        models.User.findOneAndUpdate(query, update, options, function(err, usr) {
+            if(err) {
+                console.log('check_contacts ERR:', err);
+            }
+            else {
+                callback(users);
+            }
+        });
+
+    });
+};
+
+
 //TODO: get all contacts of the user
-var get_contact_list = function(user_id) {
+var get_contact_list = function(user_id, callback) {
+    console.log('get_contact_list function');
+    models.User.findById(user_id)
+    .populate('contacts')
+    .exec(function(err, user) {
+        console.log(user.contacts);
+        if(err || !user) {
+            console.log('ERR: cannot get contact list of user.');
+        }
+        else {
+            callback(user.contacts);
+        }
+    });
 };
 
 
@@ -345,6 +375,21 @@ module.exports = {
             get_topic(topic_id, function(topic) {
                 console.log('get topic response ->', topic && topic._id);
                 (topic) ? res.json(topic) : res.sendStatus(404);
+            });
+        }
+    },
+    
+
+    get_contact_list: function(req, res) {
+        var user_id = req.params.usr_id;
+        console.log('contact list request ->', user_id);
+        if(!user_id) {
+            console.log('user_id cannot be empty.');
+            res.sendStatus(400);
+        }
+        else {
+            get_contact_list(user_id, function(contacts) {
+                res.send(contacts);
             });
         }
     },
