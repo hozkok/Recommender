@@ -139,12 +139,18 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         exec_multiple_sql(query, contacts);
     };
 
+    var get_contacts = function() {
+        return execute_sql('SELECT * FROM contacts');
+    };
+
+
     return {
         init: init_db,
         get_user_data: get_user_data,
         insert_user: insert_user,
         get_messages: get_messages,
         save_contacts: save_contacts,
+        get_contacts: get_contacts,
         save_messages: save_messages
     };
 }]);

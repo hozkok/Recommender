@@ -111,10 +111,11 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
 
     //TODO: assign this to real user contacts later...
     //$scope.contacts = [
-    //    {name: 'TestUser', phoneNum: '0871234567'},
-    //    {name: 'TestUser2', phoneNum: '0872345678'}
+    //    {uname: 'TestUser', phoneNum: '0871234567'},
+    //    {uname: 'TestUser2', phoneNum: '0872345678'}
     //];
     Contacts.then(function(contacts) {
+        console.log(contacts)
         $scope.contacts = contacts;
     });
 

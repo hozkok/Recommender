@@ -22,19 +22,30 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
                 });
             console.log('PHONE CONTACTS');
             console.log(contacts_with_phone);
-            deferred.resolve(contacts_with_phone);
+            var phones = contacts_with_phone.reduce(function(nums, contact) {
+                var curr_nums = contact.phoneNumbers;
+                for(var i = 0; i < curr_nums.length; i++)
+                    nums.push(curr_nums[0].replace(/\s+/g, ''));
+                return nums;
+            }, []);
+            console.log(phones);
+            deferred.resolve(phones);
+            //deferred.resolve(contacts_with_phone);
         });
 
         return deferred.promise;
     };
 
-    var get_relevant_contacts = function(contactList) {
+
+    var check_contacts = function(contactList) {
         var contact_url = BACKEND.url + '/contacts/:user_id';
-        return $resource(contact_url).query({user_id: userData._id}).$promise;
+        return $resource(contact_url, {}, {get: {method: 'POST', isArray: true}})
+            .get({user_id: userData._id}, contactList).$promise;
     };
 
-    console.log('Contacts service is initialized successfuly.');
-    return get_relevant_contacts(['0872345678']);
 
-    //return get_device_contacts().then(get_relevant_contacts);
+    console.log('Contacts service is initialized successfuly.');
+    //return get_relevant_contacts(['0871234567']);
+
+    return get_device_contacts().then(check_contacts);
 }]);

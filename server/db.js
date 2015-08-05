@@ -261,6 +261,20 @@ var get_contact_list = function(user_id, callback) {
 };
 
 
+var find_contacts = function(phoneNums, callback) {
+    console.log('find_contacts function');
+    models.User.find({phoneNum: {'$in': phoneNums}})
+    .exec(function(err, users) {
+        if(err) {
+            console.log('find_contacts ERR:', err);
+        }
+        else {
+            callback(users);
+        }
+    });
+};
+
+
 module.exports = {
     connect: function() {
         mongoose.connect('mongodb://localhost/recommender');
@@ -383,13 +397,18 @@ module.exports = {
     get_contact_list: function(req, res) {
         var user_id = req.params.usr_id;
         console.log('contact list request ->', user_id);
+        console.log(req.body);
         if(!user_id) {
             console.log('user_id cannot be empty.');
             res.sendStatus(400);
         }
         else {
-            get_contact_list(user_id, function(contacts) {
-                res.send(contacts);
+            // get_contact_list(user_id, function(contacts) {
+            //     res.send(contacts);
+            // });
+            find_contacts(req.body, function(contacts) {
+                console.log(contacts);
+                (contacts === []) ? res.sendStatus(404) : res.send(contacts);
             });
         }
     },
