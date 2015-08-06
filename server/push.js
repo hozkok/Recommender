@@ -69,4 +69,27 @@ pushService.pushTopic = function (topic, tokens) {
     req.end();
 };
 
+pushService.pushMsg = function(msg, tokens) {
+    var msgNotification = prepare_notification(tokens, ('New Message from ' + msg.sender.uname), msg);
+
+    var options = PUSH_OPTIONS;
+    var callback = function(res) {
+        var str = '';
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('BODY: ' + chunk);
+        });
+    };
+
+    var req = http.request(options, callback);
+    req.on('error', function(e) {
+        console.log('problem with request: ' + e.message);
+    });
+
+    req.write(JSON.stringify(topicNotification));
+    req.end();
+};
+
 module.exports = pushService;

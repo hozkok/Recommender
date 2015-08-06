@@ -335,7 +335,7 @@ module.exports = {
         // return: array of objects [{ _id, pushToken }]
         get_user_push_tokens(topic.participants, function (users) {
             // Uncomment next line for push tests.
-            // push.pushTopic(topic, users.map(function(user) {return user.pushToken}));
+            push.pushTopic(topic, users.map(function(user) {return user.pushToken}));
             console.log(users);
 
             topic.participants = users.map(function(user) {return user._id});
@@ -361,7 +361,8 @@ module.exports = {
                 //success
                 function(result) {
                     console.log('message added successfully.');
-                    res.json(result)
+                    res.json(result);
+
                 },
                 //error
                 function(err) {
@@ -397,7 +398,7 @@ module.exports = {
     get_contact_list: function(req, res) {
         var user_id = req.params.usr_id;
         console.log('contact list request ->', user_id);
-        console.log(req.body);
+        console.log('device contacts length:', req.body.length);
         if(!user_id) {
             console.log('user_id cannot be empty.');
             res.sendStatus(400);
@@ -408,7 +409,14 @@ module.exports = {
             // });
             find_contacts(req.body, function(contacts) {
                 console.log(contacts);
-                (contacts === []) ? res.sendStatus(404) : res.send(contacts);
+                if(contacts === [])
+                    return res.sendStatus(404);
+
+                res.send(contacts);
+                console.log('uid:', user_id);
+                var id_list = contacts.map(function(c) {return c._id});
+                models.User.findOneAndUpdate({_id: user_id}, {contacts: id_list})
+                .exec(console.log);
             });
         }
     },

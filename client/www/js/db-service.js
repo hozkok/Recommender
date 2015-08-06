@@ -130,17 +130,36 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var save_messages = function(messages) {
-        var query = 'INSERT INTO messages (topic_id, sender, text, date) VALUES(?, ?, ?, ?)';
-        exec_multiple_sql(query, messages);
+        var query = 'INSERT OR IGNORE INTO messages (id, topic_id, sender, text, date) VALUES(?, ?, ?, ?, ?)';
+        return exec_multiple_sql(query, messages);
     };
 
     var save_contacts = function(contacts) {
-        var query = 'INSERT INTO contacts (name, phone) VALUES(?, ?)';
-        exec_multiple_sql(query, contacts);
+        var query = 'INSERT OR IGNORE INTO contacts (name, phone) VALUES(?, ?)';
+
+        contacts = contacts.map(function(contact) {
+            return [contact.uname, contact.phoneNum];
+        });
+
+        return exec_multiple_sql(query, contacts);
     };
 
     var get_contacts = function() {
-        return execute_sql('SELECT * FROM contacts');
+        var deferred = $q.defer();
+
+        execute_sql('SELECT * FROM contacts')
+        .then(function(results) {
+            var result_arr = [];
+
+            for(var i = 0; i < results.rows.length; i++) {
+                result_arr.push(results.rows.item(i));
+            }
+
+            deferred.resolve(result_arr);
+        },
+        deferred.reject);
+
+        return deferred.promise;
     };
 
 

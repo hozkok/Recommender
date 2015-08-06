@@ -115,7 +115,7 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
     //    {uname: 'TestUser2', phoneNum: '0872345678'}
     //];
     Contacts.then(function(contacts) {
-        console.log(contacts)
+        console.log(contacts);
         $scope.contacts = contacts;
     });
 

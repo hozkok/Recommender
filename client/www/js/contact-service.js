@@ -20,15 +20,12 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
                         name: contact.displayName
                     };
                 });
-            console.log('PHONE CONTACTS');
-            console.log(contacts_with_phone);
             var phones = contacts_with_phone.reduce(function(nums, contact) {
                 var curr_nums = contact.phoneNumbers;
                 for(var i = 0; i < curr_nums.length; i++)
                     nums.push(curr_nums[0].replace(/\s+/g, ''));
                 return nums;
             }, []);
-            console.log(phones);
             deferred.resolve(phones);
             //deferred.resolve(contacts_with_phone);
         });
@@ -38,6 +35,7 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
 
 
     var check_contacts = function(contactList) {
+        console.log('attempting to check user contacts from server...');
         var contact_url = BACKEND.url + '/contacts/:user_id';
         return $resource(contact_url, {}, {get: {method: 'POST', isArray: true}})
             .get({user_id: userData._id}, contactList).$promise;
@@ -45,7 +43,32 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
 
 
     console.log('Contacts service is initialized successfuly.');
-    //return get_relevant_contacts(['0871234567']);
+    //return check_contacts(['0871234567']);
 
-    return get_device_contacts().then(check_contacts);
+    var async_contacts = get_device_contacts().then(check_contacts);
+
+    var async_contacts = $q.defer();
+
+    var contacts_synced = get_device_contacts()
+                            .then(check_contacts)
+                            .then(db.save_contacts);
+
+
+    db.get_contacts().then(function(contacts) {
+        if(contacts.length !== 0) {
+            console.log('local db contacts not empty.');
+            console.log(contacts);
+            async_contacts.resolve(contacts);
+        }
+        else {
+            contacts_synced.then(function() {
+                db.get_contacts().then(function(contacts) {
+                    console.log(contacts);
+                    async_contacts.resolve(contacts);
+                });
+            });
+        }
+    });
+
+    return async_contacts.promise;
 }]);

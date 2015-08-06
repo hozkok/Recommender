@@ -18,6 +18,7 @@ function($ionicPush, $rootScope, db, Login, userData) {
         //       we need to think about how to handle this
         onNotification: function(notification) {
             console.log('notification:', notification);
+            console.log('payload:', notification.payload);
             $rootScope.$broadcast('notification', notification);
             return true;
         }
