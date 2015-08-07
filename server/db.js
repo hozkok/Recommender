@@ -335,7 +335,10 @@ module.exports = {
         // return: array of objects [{ _id, pushToken }]
         get_user_push_tokens(topic.participants, function (users) {
             // Uncomment next line for push tests.
-            push.pushTopic(topic, users.map(function(user) {return user.pushToken}));
+            push.pushTopic(topic, users.map(function(user) {
+                console.log('pushing topic to ->', user.pushToken);
+                return user.pushToken;
+            }));
             console.log(users);
 
             topic.participants = users.map(function(user) {return user._id});

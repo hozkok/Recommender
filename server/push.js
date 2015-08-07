@@ -20,9 +20,12 @@ var PUSH_OPTIONS = {
 
 
 var prepare_notification = function(tokens, alert_msg, payload) {
+    console.log('preparing push msg');
+    console.log('tokens:', tokens);
+    console.log('payload:', payload);
     return {
         'tokens': tokens, //TODO tokens will be defined on call
-        'notifications': {
+        'notification': {
             'alert': alert_msg, //TODO this will be the message shown in notification
             'ios': {
                 "badge":1,

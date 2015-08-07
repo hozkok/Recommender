@@ -5,6 +5,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     var populate_db = function(tx) {
         //tx.executeSql('DROP TABLE IF EXISTS user');
         //tx.executeSql('DROP TABLE IF EXISTS topics');
+        //tx.executeSql('DROP TABLE IF EXISTS contacts');
         angular.forEach(DB_CONF.tables, function(table) {
             var attrs = [];
             angular.forEach(table.attrs, function(attr) {
@@ -68,6 +69,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
             return function() {
                 queries_completed++;
+                console.log('completed ' + queries_completed + ': ' + query);
                 return queries_completed === len;
             };
         }();
@@ -77,23 +79,34 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
             var result_type = {'success': 'results', 'error': 'errors'};
 
             return function(cb_type) {
-                if(cb_type !== 'success' || cb_type !== 'error')
-                    throw 'ERROR: bad callback type!';
+                console.log('generating callback:', cb_type);
+                if(cb_type !== 'success' && cb_type !== 'error') {
+                    console.log('ERROR: bad callback type!');
+                    return;
+                }
 
                 return function(tx, result) {
+                    console.log(cb_type + ' result: ' + result);
                     resolved[result_type[cb_type]].push(result);
-                    if(transaction_completed())
+                    if(transaction_completed()) {
                         async_result.resolve(resolved);
+                        console.log('all transactions completed.');
+                    }
                 };
             };
         }();
 
         var exec_queries = function(db) {
             db.transaction(function(tx) {
+                console.log('data_arr len:', data_arr.length);
+                console.log(query);
+                var success_cb = generate_callback('success'),
+                    error_cb = generate_callback('error');
                 for(var i = 0; i < data_arr.length; i++) {
+                    console.log('data' + i + ': ' + data_arr[i]);
                     tx.executeSql(query, data_arr[i],
-                                  generate_callback('success'),
-                                  generate_callback('error'));
+                                  success_cb,
+                                  error_cb);
                 }
             });
         };

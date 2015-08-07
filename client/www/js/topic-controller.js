@@ -47,9 +47,13 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
     //         }
     //     );
     // };
-    // PushService.register().then(function() {
-    //     $scope.push();
-    // });
+    PushService.register().then(function(push_token) {
+        console.log('register token', push_token);
+    });
+    $scope.$on('notification', function(event, push_data) {
+        console.log('push msg event:', event);
+        console.log('push msg listened:', push_data);
+    });
     // ================== TEST CODE (Remove) =====================
 
 }]);
@@ -163,7 +167,7 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
             what: $scope.topic.what,
             where: $scope.topic.where,
             description: $scope.topic.description,
-            participants: participants.map(function(p) {return p.phoneNum;}),
+            participants: participants.map(function(p) {return p.phone;}),
             destruct_date: $scope.topic.destruct_date
         };
 

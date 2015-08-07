@@ -4,9 +4,15 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
     var get_device_contacts = function() {
         var deferred = $q.defer();
 
+        console.log('type', typeof($cordovaContacts))
+        if(!window.cordova) {
+            console.log('zaaa');
+            deferred.resolve(['0892311229']);
+            return deferred.promise;
+        }
+
         $cordovaContacts.find({filter: '', multiple: true})
         .then(function(contacts) {
-            console.log(contacts);
             var contacts_with_phone = contacts
                 .filter(function(contact) {
                     return contact.phoneNumbers != null;
@@ -20,6 +26,7 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
                         name: contact.displayName
                     };
                 });
+
             var phones = contacts_with_phone.reduce(function(nums, contact) {
                 var curr_nums = contact.phoneNumbers;
                 for(var i = 0; i < curr_nums.length; i++)
@@ -44,8 +51,6 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
 
     console.log('Contacts service is initialized successfuly.');
     //return check_contacts(['0871234567']);
-
-    var async_contacts = get_device_contacts().then(check_contacts);
 
     var async_contacts = $q.defer();
 
