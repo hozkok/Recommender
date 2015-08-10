@@ -8,4 +8,5 @@ var recommender = angular.module('starter', ['ionic',
 	'ngResource',
 	'ionic.service.core',
   	'ionic.service.push',
-    'monospaced.elastic']);
+    'monospaced.elastic',
+    'ion-autocomplete']);

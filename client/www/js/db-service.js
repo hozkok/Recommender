@@ -175,6 +175,11 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return deferred.promise;
     };
 
+    var save_topic = function (topic) {
+        var deferred = $q.defer();
+        var query = 'INSERT OR IGNORE INTO topics (id, owner_name, what, where, description)'
+    };
+
 
     return {
         init: init_db,
