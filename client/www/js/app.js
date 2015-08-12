@@ -9,4 +9,4 @@ var recommender = angular.module('starter', ['ionic',
 	'ionic.service.core',
   	'ionic.service.push',
     'monospaced.elastic',
-    'ion-autocomplete']);
+    'angucomplete']);

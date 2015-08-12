@@ -6,6 +6,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         //tx.executeSql('DROP TABLE IF EXISTS user');
         //tx.executeSql('DROP TABLE IF EXISTS topics');
         //tx.executeSql('DROP TABLE IF EXISTS contacts');
+        //tx.executeSql('DROP TABLE IF EXISTS messages');
         angular.forEach(DB_CONF.tables, function(table) {
             var attrs = [];
             angular.forEach(table.attrs, function(attr) {
@@ -35,6 +36,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     function execute_sql(query, params) {
+        console.log('inside execute_sql func, params:', params);
         params = (typeof(params) !== 'undefined') ? params : [];
         var async_result= $q.defer();
 
@@ -176,8 +178,27 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var save_topic = function (topic) {
-        var deferred = $q.defer();
-        var query = 'INSERT OR IGNORE INTO topics (id, owner_name, what, where, description)'
+        var query = 'INSERT OR IGNORE INTO topics (id, owner_name, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?)';
+        return execute_sql(query, [
+                topic._id,
+                topic.owner_name,
+                topic.what,
+                topic.where,
+                topic.description,
+                topic.date,
+                topic.destruct_date]);
+    };
+
+    var save_message = function(msg) {
+        var query = 'INSERT OR IGNORE INTO messages (id, topic_id, text, sender_name, sender_phone, date) VALUES(?, ?, ?, ?, ?, ?)';
+        return execute_sql(query, [
+                msg._id,
+                msg.topic_id,
+                msg.text,
+                msg.sender.uname,
+                msg.sender.phone,
+                msg.date
+        ]);
     };
 
 
@@ -188,6 +209,8 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         get_messages: get_messages,
         save_contacts: save_contacts,
         get_contacts: get_contacts,
-        save_messages: save_messages
+        save_messages: save_messages,
+        save_topic: save_topic,
+        save_message: save_message
     };
 }]);

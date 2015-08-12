@@ -19,7 +19,29 @@ function($ionicPush, $rootScope, db, Login, userData) {
         onNotification: function(notification) {
             console.log('notification:', notification);
             console.log('payload:', notification.payload);
-            $rootScope.$broadcast('notification', notification);
+            var receivedObj = notification.alert;
+            var notification_type = 'notification:' + ((receivedObj.text) ? 'message' : 'topic');
+            $rootScope.$broadcast(notification_type, receivedObj);
+
+            if(notification_type === 'notification:topic') {
+                db.save_topic(receivedObj).then(function() {
+                    console.log('Topic is successfully saved into the db.');
+                }, function(err) {
+                    console.log('Topic couldnt be saved into db. ERR:', err);
+                });
+            }
+            else if(notification_type === 'notification:message') {
+                console.log('new message push notification!', receivedObj);
+                db.save_message(receivedObj).then(function() {
+                    console.log('Message is successfully saved into db.');
+                }, function(err) {
+                    console.log('Message couldnt be saved into db. ERR:', err);
+                });
+            }
+            else {
+                console.log('something is horribly wrong!');
+            }
+
             return true;
         }
     };

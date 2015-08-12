@@ -69,13 +69,13 @@ var new_topic = function(attrs, callback, err_callback) {
     else {
         attrs.owner = new ObjectId(attrs.owner);
         var topic = new models.Topic(attrs);
-        topic.save(function(err) {
+        topic.save(function(err, t) {
             if(err) {
                 err_callback(err);
             }
             else {
                 console.log('topic:', attrs.what, 'successfully saved into db.');
-                callback();
+                callback(t);
             }
         });
     }
@@ -143,13 +143,22 @@ var new_message = function(msgObj, success_callback, err_callback) {
                             else {
                                 models.Message.populate(msg, {
                                     path: 'sender',
-                                    select: 'uname -_id'
+                                    select: 'uname phoneNum -_id'
                                 }, function(err, result) {
                                     if(err) {
                                         err_callback(err);
                                     }
                                     else {
-                                        success_callback(msg);
+                                        console.log('new_message participants:', topic.participants);
+                                        var processed_msg = {
+                                            _id: msg._id,
+                                            topic_id: topic._id,
+                                            text: msg.text,
+                                            sender: msg.sender,
+                                            date: msg.date,
+                                            participants: topic.participants
+                                        };
+                                        success_callback(processed_msg);
                                     }
                                 });
                             }
@@ -181,9 +190,14 @@ var get_topic_list = function(usr_id, callback) {
 };
 
 // return: array of objects [{ _id, pushToken }]
-var get_user_push_tokens = function (numbers, callback) {
+var get_user_push_tokens = function(numbers, find_in, callback) {
+    var find_in_not_passed = (typeof(callback) === 'undefined');
+    callback = find_in_not_passed  ? find_in : callback;
+    find_in = find_in_not_passed ? 'phoneNum' : find_in;
     // TODO: find and return the pushTokens for the given numbers
-    models.User.find({phoneNum: {$in: numbers}}).select('pushToken')
+    var query = {};
+    query[find_in] = {$in: numbers};
+    models.User.find(query).select('pushToken')
     .exec(function(err, users) {
         if(err | !users) {
             console.log('cannot find users.');
@@ -334,17 +348,26 @@ module.exports = {
         // Get user push tokens from db using the receivers phone numbers
         // return: array of objects [{ _id, pushToken }]
         get_user_push_tokens(topic.participants, function (users) {
-            // Uncomment next line for push tests.
-            push.pushTopic(topic, users.map(function(user) {
-                console.log('pushing topic to ->', user.pushToken);
-                return user.pushToken;
-            }));
-            console.log(users);
-
             topic.participants = users.map(function(user) {return user._id});
             new_topic(topic, 
                 //success
-                function() {
+                function(saved_topic) {
+                    var push_obj = {
+                        _id: saved_topic._id,
+                        owner_name : topic.owner_name,
+                        what: saved_topic.what,
+                        where: saved_topic.where,
+                        description: saved_topic.description,
+                        date: saved_topic.date,
+                        destruct_date: saved_topic.destruct_date,
+                        participants: topic.participants
+                    };
+
+                    // Uncomment next line for push tests.
+                    push.pushTopic(push_obj, users.map(function(user) {
+                        return user.pushToken;
+                    }));
+
                     res.sendStatus(200);
                 }, function(err) {
                     console.log('new_topic error:', err);
@@ -364,7 +387,13 @@ module.exports = {
                 //success
                 function(result) {
                     console.log('message added successfully.');
-                    res.json(result);
+                    console.log(result);
+                    get_user_push_tokens(result.participants, '_id', function(users) {
+                        push.pushMessage(result, users.map(function(user) {
+                            return user.pushToken;
+                        }));
+                        res.json(result);
+                    });
 
                 },
                 //error

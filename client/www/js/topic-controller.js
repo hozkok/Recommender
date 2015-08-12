@@ -50,9 +50,9 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
     PushService.register().then(function(push_token) {
         console.log('register token', push_token);
     });
-    $scope.$on('notification', function(event, push_data) {
+    $scope.$on('notification:topic', function(event, push_data) {
         console.log('push msg event:', event);
-        console.log('push msg listened:', push_data);
+        console.log('new topic push listened:', push_data);
     });
     // ================== TEST CODE (Remove) =====================
 
@@ -164,8 +164,9 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
 
         var topic = {
             owner: userData._id,
+            owner_name: userData.name,
             what: $scope.topic.what,
-            where: $scope.topic.where,
+            where: $scope.topic.where.title,
             description: $scope.topic.description,
             participants: participants.map(function(p) {return p.phone;}),
             destruct_date: $scope.topic.destruct_date
@@ -186,11 +187,19 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
     };
 
 
+    $scope.locations = '';
+    LocationService.find_locations('').then(function(locs) {
+        $scope.locations = locs.map(function(loc) {
+            return {name: loc};
+        });
+    });
+
     $scope.search = function() {
         LocationService.find_locations($scope.topic.what)
         .then(
             function(locs) {
                 console.log(locs);
+                $scope.locs = locs;
             }
         );
     };

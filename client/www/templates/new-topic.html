@@ -7,12 +7,25 @@
         <div class="list">
             <label class="item item-input item-floating-label">
                 <span class="input-label">What</span>
-                <input type="text" placeholder="What" ng-model="topic.what" ng-change="search()">
+                <!--input type="text" placeholder="What" ng-model="topic.what" ng-change="search()"/-->
+                <input type="text" placeholder="What" ng-model="topic.what"/>
             </label>
 
-            <label class="item item-input item-floating-label">
-                <span class="input-label">Where</span>
-                <input type="text" placeholder="Where" ng-model="topic.where"/>
+            <label ng-model="topic.where" class="item item-input item-floating-label">
+                <span class="input-label">Where: {{topic.where.title}}</span>
+                <!--input type="text" placeholder="Where" ng-model="topic.where"/-->
+                <!--input ion-autocomplete ng-model="topic.where"/-->
+                <!--div auto-completer data="locs" ng-model="topic.where" placeholder="asdasd"></div-->
+                <angucomplete id="where-autocomplete"
+                              placeholder="Where"
+                              pause="300"
+                              selectedobject="topic.where"
+                              localdata="locations"
+                              titlefield="name"
+                              searchfields="name"
+                              minlength="1"
+                              input-class="form-control"
+                />
             </label>
 
             <label class="item item-input item-floating-label">

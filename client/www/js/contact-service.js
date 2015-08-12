@@ -4,9 +4,7 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
     var get_device_contacts = function() {
         var deferred = $q.defer();
 
-        console.log('type', typeof($cordovaContacts))
         if(!window.cordova) {
-            console.log('zaaa');
             deferred.resolve(['0892311229']);
             return deferred.promise;
         }

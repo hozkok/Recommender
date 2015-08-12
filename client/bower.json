@@ -5,6 +5,7 @@
     "ionic": "driftyco/ionic-bower#1.0.1"
   },
   "dependencies": {
-    "ion-autocomplete": "~0.2.3"
+    "ion-autocomplete": "~0.2.3",
+    "angucomplete-alt": "~1.1.0"
   }
 }

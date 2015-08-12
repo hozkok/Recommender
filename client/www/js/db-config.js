@@ -35,7 +35,8 @@ recommender.constant('DB_CONF', {
                 {name: 'id', type: 'text unique'},
                 {name: 'topic_id', type: 'text'},
                 {name: 'text', type: 'text'},
-                {name: 'sender', type: 'text'},
+                {name: 'sender_name', type: 'text'},
+                {name: 'sender_phone', type: 'text'},
                 {name: 'date', type: 'datetime'}
             ]
         },

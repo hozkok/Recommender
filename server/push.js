@@ -26,7 +26,8 @@ var prepare_notification = function(tokens, alert_msg, payload) {
     return {
         'tokens': tokens, //TODO tokens will be defined on call
         'notification': {
-            'alert': alert_msg, //TODO this will be the message shown in notification
+            //'alert': alert_msg, //TODO this will be the message shown in notification
+            'alert': payload,
             'ios': {
                 "badge":1,
                 "sound":"ping.aiff",
@@ -72,7 +73,7 @@ pushService.pushTopic = function (topic, tokens) {
     req.end();
 };
 
-pushService.pushMsg = function(msg, tokens) {
+pushService.pushMessage = function(msg, tokens) {
     var msgNotification = prepare_notification(tokens, ('New Message from ' + msg.sender.uname), msg);
 
     var options = PUSH_OPTIONS;
@@ -91,7 +92,7 @@ pushService.pushMsg = function(msg, tokens) {
         console.log('problem with request: ' + e.message);
     });
 
-    req.write(JSON.stringify(topicNotification));
+    req.write(JSON.stringify(msgNotification));
     req.end();
 };
 
