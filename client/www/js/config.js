@@ -26,6 +26,8 @@ recommender.config(function($stateProvider, $urlRouterProvider, $ionicAppProvide
         // The public API key all services will use for this app
         api_key: 'b928f9384ca95a5e6191540a5e4e0b2482ca3faa1d4f9680',
         // Set the app to use development pushes
-        dev_push: true
+        dev_push: false,
+        // GCM project number
+        gcm_id: '549069002648'
     });
 });
