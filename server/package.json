@@ -4,11 +4,11 @@
   "description": "messaging app",
   "main": "server.js",
   "dependencies": {
-    "body-parser": "^1.12.4",
+    "body-parser": "~1.0.1",
     "express": "^4.12.4",
     "mongodb": "^2.0.33",
     "mongoose": "^4.0.5",
-    "body-parser": "~1.0.1"
+    "node-gcm": "^0.11.0"
   },
   "devDependencies": {},
   "scripts": {

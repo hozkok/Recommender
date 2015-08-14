@@ -9,6 +9,49 @@ function($ionicPush, $rootScope, db, Login, userData) {
         Login.update({user_id: userData._id}, {pushToken: pushToken});
     });
 
+    var handle_gcm_push = function(notification) {
+        switch(notification.event) {
+            case 'registered':
+                console.log('register notification:', notification);
+                break;
+            case 'message':
+                if(notification.payload['gcm.notification.message']) {
+                    var msg_payload = notification.payload['gcm.notification.message'];
+                    console.log('push message received:', msg_payload);
+                    db.save_message(msg_payload).then(
+                        function() {
+                            console.log('message is successfully saved into local db.');
+                        },
+                        function(err) {
+                            console.log('ERR: message couldnt be saved into local db.',err)
+                        }
+                    );
+                }
+                else if(notification.payload['gcm.notification.topic']) {
+                    var topic_payload = notification.payload['gcm.notification.topic'];
+                    console.log('push topic received:', topic_payload);
+                    db.save_topic(topic_payload).then(
+                        function() {
+                            console.log('Topic is successfully saved into the db.');
+                        },
+                        function(err) {
+                            console.log('ERR: Topic couldnt be saved into db. ERR:', err);
+                        }
+                    );
+                }
+                else {
+                    console.log('ERR: unidentified message type');
+                }
+                break;
+            case 'error':
+                console.log('An error occured during notification event.');
+                break;
+            default:
+                console.log('Unknown push notification event!');
+                break;
+        }
+    };
+
     var registerOptions = {
         canShowAlert: true, 
         canSetBadge: true, 
@@ -17,8 +60,12 @@ function($ionicPush, $rootScope, db, Login, userData) {
         // TODO: OnNotification should be a function somewhere else,
         //       we need to think about how to handle this
         onNotification: function(notification) {
-            console.log('notification:', notification);
-            console.log('payload:', notification.payload);
+            if(ionic.Platform.isAndroid()) {
+                handle_gcm_push(notification);
+            }
+            else {
+                console.log('Push platform is not supported yet.')
+            }
             // TODO: change receivedObj to android when using real tokens
             //var receivedObj = notification.alert;
             //var notification_type = 'notification:' + ((receivedObj.text) ? 'message' : 'topic');

@@ -196,7 +196,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
                 msg.topic_id,
                 msg.text,
                 msg.sender.uname,
-                msg.sender.phone,
+                msg.sender.phoneNum,
                 msg.date
         ]);
     };
