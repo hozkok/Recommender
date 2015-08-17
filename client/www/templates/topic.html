@@ -28,7 +28,7 @@
         <div ng-repeat="msg in topic.messages">
             <div class="card item item-text-wrap stable-bg">
                 {{msg.text}}
-                <span class="item-note">{{msg.sender.uname + ' - ' + (msg.date | date: 'yyyy/MM/dd h:mma')}}</span>
+                <span class="item-note">{{msg.sender_name + ' - ' + (msg.date | date: 'yyyy/MM/dd h:mma')}}</span>
             </div>
         </div>
     </ion-content>

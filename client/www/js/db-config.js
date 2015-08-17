@@ -22,6 +22,7 @@ recommender.constant('DB_CONF', {
             attrs: [
                 {name: 'id', type: 'text unique'},
                 {name: 'owner_name', type: 'text'},
+                {name: 'owner_phone', type: 'text'},
                 {name: '`what`', type: 'text'},
                 {name: '`where`', type: 'text'},
                 {name: 'description', type: 'text'},

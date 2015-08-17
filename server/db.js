@@ -355,6 +355,7 @@ module.exports = {
                     var push_obj = {
                         _id: saved_topic._id,
                         owner_name : topic.owner_name,
+                        owner_phone: topic.owner_phone,
                         what: saved_topic.what,
                         where: saved_topic.where,
                         description: saved_topic.description,
@@ -368,7 +369,7 @@ module.exports = {
                         return user.pushToken;
                     }));
 
-                    res.sendStatus(200);
+                    res.send(push_obj);
                 }, function(err) {
                     console.log('new_topic error:', err);
                     res.sendStatus(500);

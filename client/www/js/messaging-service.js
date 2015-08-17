@@ -18,6 +18,7 @@ function($ionicPush, $rootScope, db, Login, userData) {
                 if(notification.payload['gcm.notification.message']) {
                     var msg_payload = notification.payload['gcm.notification.message'];
                     console.log('push message received:', msg_payload);
+                    $rootScope.$broadcast('push:message', msg_payload);
                     db.save_message(msg_payload).then(
                         function() {
                             console.log('message is successfully saved into local db.');
@@ -30,6 +31,7 @@ function($ionicPush, $rootScope, db, Login, userData) {
                 else if(notification.payload['gcm.notification.topic']) {
                     var topic_payload = notification.payload['gcm.notification.topic'];
                     console.log('push topic received:', topic_payload);
+                    $rootScope.$broadcast('push:topic', topic_payload);
                     db.save_topic(topic_payload).then(
                         function() {
                             console.log('Topic is successfully saved into the db.');

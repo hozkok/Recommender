@@ -35,6 +35,15 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         );
     };
 
+    function result_to_obj_arr(results) {
+        var obj_arr = [];
+        console.log('result_to_obj_arr results', results);
+        for(var i = 0; i < results.rows.length; i++) {
+            obj_arr.push(results.rows.item(i));
+        }
+        return obj_arr;
+    };
+
     function execute_sql(query, params) {
         console.log('inside execute_sql func, params:', params);
         params = (typeof(params) !== 'undefined') ? params : [];
@@ -141,7 +150,13 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
     var get_messages = function(topic_id) {
         var query = 'SELECT * FROM messages WHERE topic_id=?';
-        return execute_sql(query, [topic_id]);
+        var deferred = $q.defer();
+
+        execute_sql(query, [topic_id]).then(function(messages) {
+            deferred.resolve(result_to_obj_arr(messages));
+        }, deferred.reject);
+
+        return deferred.promise;
     };
 
     var save_messages = function(messages) {
@@ -178,10 +193,12 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var save_topic = function (topic) {
-        var query = 'INSERT OR IGNORE INTO topics (id, owner_name, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?)';
+        var query = 'INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
+        console.log('save_topic params:',topic);
         return execute_sql(query, [
                 topic._id,
                 topic.owner_name,
+                topic.owner_phone,
                 topic.what,
                 topic.where,
                 topic.description,
@@ -201,6 +218,29 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         ]);
     };
 
+    var get_topic = function(topic_id) {
+        var query = 'SELECT * FROM topics WHERE id = ?';
+        var deferred = $q.defer();
+
+        execute_sql(query, [topic_id])
+        .then(function(result) {
+            console.log('get_topic result:', result);
+            deferred.resolve((result.rows.length === 0) ? null : result.rows.item(0));
+        });
+
+        return deferred.promise;
+    };
+
+    var get_topic_list = function() {
+        var deferred = $q.defer();
+        var query = 'SELECT * FROM topics';
+        execute_sql(query).then(function(results) {
+            obj_arr = result_to_obj_arr(results);
+            deferred.resolve(obj_arr);
+        }, deferred.reject);
+        return deferred.promise;
+    };
+
 
     return {
         init: init_db,
@@ -211,6 +251,8 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         get_contacts: get_contacts,
         save_messages: save_messages,
         save_topic: save_topic,
-        save_message: save_message
+        save_message: save_message,
+        get_topic: get_topic,
+        get_topic_list: get_topic_list
     };
 }]);

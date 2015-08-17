@@ -18,6 +18,10 @@ recommender.config(function($stateProvider, $urlRouterProvider, $ionicAppProvide
         .state('newTopic', {
             templateUrl: 'templates/new-topic.html',
             controller: 'newTopicCtrl'
+        })
+        .state('share', {
+            templateUrl: 'templates/share-app.html',
+            controller: 'shareCtrl'
         });
 
     $ionicAppProvider.identify({

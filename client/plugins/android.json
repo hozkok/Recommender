@@ -35,6 +35,10 @@
                         {
                             "xml": "<feature name=\"Contacts\"><param name=\"android-package\" value=\"org.apache.cordova.contacts.ContactManager\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"SocialSharing\"><param name=\"android-package\" value=\"nl.xservices.plugins.SocialSharing\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -97,6 +101,10 @@
                         {
                             "xml": "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\" />",
                             "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
+                            "count": 1
                         }
                     ]
                 }
@@ -126,6 +134,9 @@
             "PACKAGE_NAME": "com.ionicframework.client730495"
         },
         "cordova-plugin-contacts": {
+            "PACKAGE_NAME": "com.ionicframework.client730495"
+        },
+        "nl.x-services.plugins.socialsharing": {
             "PACKAGE_NAME": "com.ionicframework.client730495"
         }
     },

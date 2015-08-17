@@ -4,9 +4,20 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
     console.log('topicListCtrl is initialized successfully.');
     console.log('topicListCtrl uid param:', userData._id);
 
-    Topics.query({user_id: userData._id}, function(topics) {
-        console.log(topics);
+    //Topics.query({user_id: userData._id}, function(topics) {
+    //    console.log(topics);
+    //    $scope.topics = topics;
+    //});
+    
+    $scope.$on('push:topic', function(push_topic) {
+        $scope.topics.push(push_topic);
+    });
+
+    db.get_topic_list().then(function(topics) {
+        console.log('All Topics:', topics);
         $scope.topics = topics;
+    }, function(err) {
+        console.log('get_topic_list ERR:', err);
     });
 
     $ionicPopover.fromTemplateUrl('templates/dropdown-popover.html', {scope: $scope})
@@ -64,13 +75,32 @@ recommender.controller('topicCtrl',
 function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, userData, Message) {
     console.log('topicCtrl is initialized successfully.');
     console.log('topic id:', $stateParams.topic_id);
+    var topic_id = $stateParams.topic_id;
     var footer = document.body.querySelector('.message-footer');
     $scope.message = '';
+    $scope.topic = {};
+    $scope.topic.messages = [];
 
-    Topic.get({topic_id: $stateParams.topic_id}, function(topic) {
-        console.log('topic ->', topic);
+    db.get_topic(topic_id).then(function(topic) {
+        console.log('topic query result:', topic);
         $scope.topic = topic;
     });
+
+    db.get_messages(topic_id).then(function(messages) {
+        console.log('Topic Messages:', messages);
+        $scope.topic.messages = messages;
+    });
+
+    $scope.$on('push:message', function(push_message) {
+        if(push_message.topic_id === topic_id)
+            $scope.topic.messages.push(push_message);
+    });
+
+    //Topic.get({topic_id: $stateParams.topic_id}, function(topic) {
+    //    console.log('topic ->', topic);
+    //    $scope.topic = topic;
+    //});
+
     $scope.go_back = $ionicHistory.goBack;
 
     $scope.$on('elastic:height-changed', function(event, msgHeight) {
@@ -93,7 +123,13 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
         .$promise.then(
             //success
             function(msg) {
-                console.log('message is successfully sent to the server.');
+                console.log('message is successfully sent to the server.', msg);
+                db.save_message(msg).then(function() {
+                    console.log('new message is successfully saved into db.');
+                }, function(err) {
+                    console.log('new message cannot be saved into db, ERR:', err);
+                });
+                msg.sender_name = userData.name;
                 $scope.topic.messages.push(msg);
                 $scope.message = '';
             },
@@ -105,8 +141,8 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
 }]);
 
 recommender.controller('newTopicCtrl',
-['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService', 'Contacts',
-function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService, Contacts) {
+['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService', 'Contacts', 'db',
+function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService, Contacts, db) {
     var participants = [];
     $scope.topic = {};
     $scope.go_back = $ionicHistory.goBack;
@@ -161,10 +197,11 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
             });
             return;
         }
-
+        console.log('userData:', userData);
         var topic = {
             owner: userData._id,
             owner_name: userData.name,
+            owner_phone: userData.phoneNum,
             what: $scope.topic.what,
             where: $scope.topic.where.title,
             description: $scope.topic.description,
@@ -175,8 +212,13 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
         Topics.save(topic)
         .$promise.then(
             //success
-            function() {
-                console.log('Topic is successfully sent to the server.');
+            function(received_topic) {
+                console.log('Topic is successfully sent to the server:', received_topic);
+                db.save_topic(received_topic).then(function() {
+                    console.log('new topic is successfully saved into db.');
+                }, function(err) {
+                    console.log('new topic couldnt be saved into db ERR:', err);
+                });
                 $state.go('topicList');
             },
             //error
