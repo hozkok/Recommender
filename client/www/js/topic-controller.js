@@ -9,8 +9,17 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
     //    $scope.topics = topics;
     //});
     
-    $scope.$on('push:topic', function(push_topic) {
-        $scope.topics.push(push_topic);
+    $scope.$on('push:topic', function(event, push_topic) {
+        // console.log('TopicListCtrl received broadcast push topic:', push_topic);
+        $scope.topics.push({
+            id: push_topic._id,
+            owner_name: push_topic.owner_name,
+            what: push_topic.what,
+            where: push_topic.where,
+            description: push_topic.description,
+            date: push_topic.date,
+            destruct_date: push_topic.destruct_date
+        });
     });
 
     db.get_topic_list().then(function(topics) {
@@ -80,6 +89,13 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
     $scope.message = '';
     $scope.topic = {};
     $scope.topic.messages = [];
+
+    $scope.$on('push:message', function(event, push_msg) {
+        if(push_msg.topic_id === topic_id) {
+            push_msg.sender_name = push_msg.sender.uname;
+            $scope.topic.messages.push(push_msg);
+        }
+    });
 
     db.get_topic(topic_id).then(function(topic) {
         console.log('topic query result:', topic);

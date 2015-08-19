@@ -7,13 +7,21 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         //tx.executeSql('DROP TABLE IF EXISTS topics');
         //tx.executeSql('DROP TABLE IF EXISTS contacts');
         //tx.executeSql('DROP TABLE IF EXISTS messages');
+        //tx.executeSql('DROP TABLE IF EXISTS participants');
         angular.forEach(DB_CONF.tables, function(table) {
             var attrs = [];
             angular.forEach(table.attrs, function(attr) {
                 attrs.push(attr.name + ' ' + attr.type);
             });
-            tx.executeSql('CREATE TABLE IF NOT EXISTS ' + table.name +
-                '(' + attrs.join(',') + ')');
+
+            var pk_expression = (typeof(table.primary_keys) === 'undefined') ? '':
+                ', PRIMARY KEY(' + table.primary_keys.join(',') + ')';
+            
+            // create table statement
+            var sql_statement = 'CREATE TABLE IF NOT EXISTS ' + 
+                                table.name + '(' + attrs.join(',') + pk_expression + ')';
+
+            tx.executeSql(sql_statement);
         });
     };
 
@@ -192,9 +200,28 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return deferred.promise;
     };
 
+    var save_participants = function(topic_id, participants) {
+        var query = 'INSERT OR IGNORE INTO participants (topic_id, phone) VALUES(?, ?)';
+        var sql_params = participants.map(function(phone) {
+            return [topic_id, phone];
+        });
+        return exec_multiple_sql(query, sql_params);
+    };
+
+    var get_participants = function(topic_id) {
+        var query = 'SELECT phone FROM participants WHERE topic_id = ?';
+        return execute_sql(query, [topic_id]);
+    };
+
     var save_topic = function (topic) {
         var query = 'INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
         console.log('save_topic params:',topic);
+
+        save_participants(topic._id, topic.participants)
+        .then(function(results) {
+            console.log('topic_id:', topic._id, 'save_participants is executed. results:', results);
+        });
+
         return execute_sql(query, [
                 topic._id,
                 topic.owner_name,
@@ -235,7 +262,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         var deferred = $q.defer();
         var query = 'SELECT * FROM topics';
         execute_sql(query).then(function(results) {
-            obj_arr = result_to_obj_arr(results);
+            var obj_arr = result_to_obj_arr(results);
             deferred.resolve(obj_arr);
         }, deferred.reject);
         return deferred.promise;

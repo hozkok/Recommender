@@ -44,10 +44,10 @@ recommender.constant('DB_CONF', {
         {
             name: 'participants',
             attrs: [
-                {name: 'topic_id', type: 'text'},
-                {name: 'name', type: 'text'},
-                {name: 'phone', type: 'text'}
-            ]
+                {name: 'topic_id', type: 'text NOT NULL'},
+                {name: 'phone', type: 'text NOT NULL'}
+            ],
+            primary_key: ['topic_id', 'phone']
         }
     ]
 });

@@ -156,7 +156,8 @@ var new_message = function(msgObj, success_callback, err_callback) {
                                             text: msg.text,
                                             sender: msg.sender,
                                             date: msg.date,
-                                            participants: topic.participants
+                                            participants: topic.participants,
+                                            owner_id: topic.owner
                                         };
                                         success_callback(processed_msg);
                                     }
@@ -343,15 +344,18 @@ module.exports = {
         //                              participants: []
 
         var topic = req.body;
+        var participant_phones = topic.participants;
+        // participant_phones.push(topic.owner_phone);
         console.log('\nnew_topic request: ' + JSON.stringify(req.body));
 
         // Get user push tokens from db using the receivers phone numbers
         // return: array of objects [{ _id, pushToken }]
-        get_user_push_tokens(topic.participants, function (users) {
+        get_user_push_tokens(participant_phones, function (users) {
             topic.participants = users.map(function(user) {return user._id});
             new_topic(topic, 
                 //success
                 function(saved_topic) {
+                    // object to be saved in the client database
                     var push_obj = {
                         _id: saved_topic._id,
                         owner_name : topic.owner_name,
@@ -361,10 +365,10 @@ module.exports = {
                         description: saved_topic.description,
                         date: saved_topic.date,
                         destruct_date: saved_topic.destruct_date,
-                        participants: topic.participants
+                        participants: participant_phones
                     };
+                    console.log('push_obj:', push_obj);
 
-                    // Uncomment next line for push tests.
                     push.pushTopic(push_obj, users.map(function(user) {
                         return user.pushToken;
                     }));
@@ -388,6 +392,12 @@ module.exports = {
                 //success
                 function(result) {
                     console.log('message added successfully.');
+                    var sender_id = req.body.sender_id, owner_id = result.owner_id;
+                    console.log('topic owner id:', owner_id);
+                    result.participants.push(owner_id);
+                    result.participants = result.participants.filter(function(participant_id) {
+                        return participant_id.toString() !== sender_id;
+                    });
                     console.log(result);
                     get_user_push_tokens(result.participants, '_id', function(users) {
                         push.pushMessage(result, users.map(function(user) {

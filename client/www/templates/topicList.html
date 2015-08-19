@@ -7,7 +7,7 @@
         <ion-list>
             <ion-item class="item" ng-repeat="topic in topics | orderBy: '-date'" ui-sref="topic({topic_id: topic.id})">
                 <h2>{{topic.what}}<h2>
-                <p>{{topic.owner.uname}}</p>
+                <p>{{topic.owner_name}}</p>
                 <span class="item-note">
                     {{topic.date | date: 'yyyy/MM/dd h:mma'}}
                     </br>

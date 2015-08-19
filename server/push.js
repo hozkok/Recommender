@@ -120,6 +120,7 @@ pushService.pushMessage = function(msg, tokens) {
     message.addData('message', 'New message is received from ' + msg.sender.uname);
     message.addData('title', 'Recommender Message');
     message.addData('msgcnt', '1');
+    message.addData('payload', {'$state': 'topic', '$stateParams': JSON.stringify({topic_id: msg.topic_id})});
     message.addNotification('message', msg);
     message.timeToLive = 3000;
 
