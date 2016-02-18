@@ -41,6 +41,19 @@ function($ionicPush, $rootScope, db, Login, userData) {
                         }
                     );
                 }
+                else if (notification.payload['gcm.notification.participant']) {
+                    var participant_payload = notification.payload['gcm.notification.participant'];
+                    console.log('push participant received:', participant_payload);
+                    $rootScope.$broadcast('push:participant', participant_payload);
+                    db.new_participant(participant_payload).then(
+                        function () {
+                            console.log('New participant is successfully saved into db.');
+                        },
+                        function (err) {
+                            console.log('ERR: new participant couldnt be saved into db:', err);
+                        }
+                    );
+                }
                 else {
                     console.log('ERR: unidentified message type');
                 }

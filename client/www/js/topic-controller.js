@@ -189,6 +189,8 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
                 type: 'button-positive',
                 onTap: function(e) {
                     console.log('participants are selected.');
+                    if (!$scope.contacts) return;
+
                     participants = $scope.contacts.filter(function(c) {return c.checked});
                 }
             }]

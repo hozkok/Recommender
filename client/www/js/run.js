@@ -12,15 +12,17 @@ recommender.run(['$ionicPlatform', 'db', '$state', 'userData', function($ionicPl
         if(window.StatusBar) {
             StatusBar.styleDefault();
         }
+
+        // initialize local database...
         db.init();
+
         var user_data = db.get_user_data();
-        user_data.then(function(result) {
+        user_data.then(function (result) {
             if(result.rows.length === 0) {
                 console.log('user not found');
                 $state.go('login');
-            }
-            else {
-                console.log('result:', result);
+            } else {
+                console.log('user_data result:', result);
                 userData._id = result.rows.item(0).id;
                 userData.phoneNum = result.rows.item(0).phone;
                 userData.name = result.rows.item(0).name;
