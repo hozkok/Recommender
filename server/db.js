@@ -175,6 +175,7 @@ var get_topic_list = function(usr_id, callback) {
     models.Topic
         .find({$or: [{owner: usr_id}, {participants: usr_id}]})
         .populate('owner')
+        .populate('messages')
         .exec(function(err, topics) {
             if(err || !topics) {
                 console.log('couldn\'t find topics for specified user.');
