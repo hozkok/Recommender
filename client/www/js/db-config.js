@@ -45,6 +45,7 @@ recommender.constant('DB_CONF', {
             name: 'participants',
             attrs: [
                 {name: 'topic_id', type: 'text NOT NULL'},
+                {name: 'uname', type: 'text NOT NULL'},
                 {name: 'phone', type: 'text NOT NULL'}
             ],
             primary_key: ['topic_id', 'phone']

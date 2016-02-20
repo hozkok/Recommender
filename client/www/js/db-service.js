@@ -205,9 +205,9 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var save_participants = function(topic_id, participants) {
-        var query = 'INSERT OR IGNORE INTO participants (topic_id, phone) VALUES(?, ?)';
-        var sql_params = participants.map(function(phone) {
-            return [topic_id, phone];
+        var query = 'INSERT OR IGNORE INTO participants (topic_id, uname, phone) VALUES(?, ?, ?)';
+        var sql_params = participants.map(function(participant) {
+            return [topic_id, participant.uname, participant.phoneNum];
         });
         return exec_multiple_sql(query, sql_params);
     };
@@ -221,6 +221,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         var query = 'INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
         console.log('save_topic params:',topic);
 
+        // topic.participants = { uname, phoneNum }
         save_participants(topic._id, topic.participants)
         .then(function(results) {
             console.log('topic_id:', topic._id, 'save_participants is executed. results:', results);
@@ -272,6 +273,49 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return deferred.promise;
     };
 
+    function sync_local_db (topics) {
+        function sync_topic (topic) {
+            return execute_sql('INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [topic._id,
+                                  topic.owner.uname,
+                                  topic.owner.phoneNum,
+                                  topic.what,
+                                  topic.where,
+                                  topic.description,
+                                  topic.date,
+                                  topic.destruct_date])
+        }
+
+        function sync_participant (participant) {
+            return execute_sql('INSERT OR IGNORE INTO participants (topic_id, uname, phone) VALUES (?, ?, ?)', [
+                participant.topic_id,
+                participant.uname,
+                participant.phoneNum
+            ]);
+        }
+
+        var promises = [];
+        topics.forEach(function (topic) {
+            promises.push(sync_topic(topic));
+            promises.concat(
+                topic.participants.map(
+                    function (participant) {
+                        return sync_participant({
+                            topic_id: topic._id,
+                            uname: participant.uname,
+                            phoneNum: participant.phoneNum
+                        });
+                    }
+                ),
+                topic.messages.map(
+                    function (message) {
+                        message.topic_id = topic._id;
+                        return save_message(message);
+                    }
+                )
+            );
+        });
+        return $q.all(promises);
+    }
 
     return {
         init: init_db,
@@ -284,6 +328,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         save_topic: save_topic,
         save_message: save_message,
         get_topic: get_topic,
-        get_topic_list: get_topic_list
+        get_topic_list: get_topic_list,
+        sync_local_db: sync_local_db
     };
 }]);
