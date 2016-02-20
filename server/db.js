@@ -428,13 +428,35 @@ module.exports = {
         var topic_id = req.params.topic_id;
         if(!topic_id) {
             res.sendStatus(400);
-        }
-        else {
+        } else {
             get_topic(topic_id, function(topic) {
                 console.log('get topic response ->', topic && topic._id);
                 (topic) ? res.json(topic) : res.sendStatus(404);
             });
         }
+    },
+
+
+    add_participant: function (req, res) {
+        if (!req.body.phoneNo)
+            return res.status(400).send('missing field: phoneNo');
+
+        models.User.findOne({phoneNum: req.body.phoneNo}, function (err, user) {
+            if (err) {
+                console.log('add participant err:', err);
+                return res.status(500).send(err);
+            }
+            console.log('user:', user);
+            models.Topic.findByIdAndUpdate(req.params.topicId, {
+                $push: {participants: {user._id}}
+            }, function (err, topic) {
+                if (err) {
+                    console.log('err:', err);
+                    return res.status(500).send(err);
+                }
+            });
+        });
+
     },
     
 
