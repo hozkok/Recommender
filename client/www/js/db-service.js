@@ -292,11 +292,10 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
                 participant.phoneNum
             ]);
         }
-
-        var promises = [];
-        topics.forEach(function (topic) {
-            promises.push(sync_topic(topic));
-            promises.concat(
+        
+        var db_operations = topics.reduce(function (acc_arr, topic) {
+            return acc_arr.concat(
+                [sync_topic(topic)],
                 topic.participants.map(
                     function (participant) {
                         return sync_participant({
@@ -313,8 +312,8 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
                     }
                 )
             );
-        });
-        return $q.all(promises);
+        }, []);
+        return $q.all(db_operations);
     }
 
     return {
