@@ -1,6 +1,6 @@
 recommender.controller('topicListCtrl',
-['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover',
-function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover) {
+['$scope', '$state', 'userData', '$resource', 'db', 'Topics', 'PushService', '$ionicPopover', 'syncService',
+function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover, syncService) {
     console.log('topicListCtrl is initialized successfully.');
     console.log('topicListCtrl uid param:', userData._id);
 
@@ -22,7 +22,7 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
         });
     });
 
-    db.get_topic_list().then(function(topics) {
+    db.get_topic_list().then(function (topics) {
         console.log('All Topics:', topics);
         $scope.topics = topics;
     }, function(err) {
@@ -39,6 +39,15 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
             popover.hide();
         };
     });
+
+    $scope.sync = function () {
+        syncService.sync_all()
+        .then(db.get_topic_list)
+        .then(function (topics) {
+            $scope.topics = topics;
+        })
+        .finally($scope.$broadcast.bind($scope, 'scroll.refreshComplete'));
+    };
     
     // ================== TEST CODE (Remove) =====================
     // var topicRequest = {
@@ -80,8 +89,8 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
 
 
 recommender.controller('topicCtrl', 
-['$scope', '$state', '$stateParams', '$resource', '$ionicHistory', 'db', 'Topic', 'userData', 'Message',
-function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, userData, Message) {
+['$scope', '$state', '$stateParams', '$resource', '$ionicHistory', 'db', 'Topic', 'userData', 'Message', '$ionicLoading',
+function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, userData, Message, $ionicLoading) {
     console.log('topicCtrl is initialized successfully.');
     console.log('topic id:', $stateParams.topic_id);
     var topic_id = $stateParams.topic_id;
@@ -130,6 +139,9 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
     });
 
     $scope.send_message = function() {
+        $ionicLoading.show({
+            template: '<p>Sending message...</p><ion-spinner></ion-spinner>'
+        });
         var msg = {
             text: $scope.message,
             sender_id: userData._id,
@@ -152,13 +164,14 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
             //error
             function(err) {
                 console.log('error: message could not be sent ->', err);
-            });
+            }
+        ).finally($ionicLoading.hide.bind($ionicLoading));
     };
 }]);
 
 recommender.controller('newTopicCtrl',
-['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService', 'Contacts', 'db',
-function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService, Contacts, db) {
+['$scope', 'userData', '$ionicHistory', '$ionicPopup', 'Topics', '$state', 'LocationService', 'Contacts', 'db', '$ionicLoading',
+function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationService, Contacts, db, $ionicLoading) {
     var participants = [];
     $scope.topic = {};
     $scope.go_back = $ionicHistory.goBack;
@@ -215,6 +228,9 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
             });
             return;
         }
+        $ionicLoading.show({
+            template: '<p>Creating topic...</p><ion-spinner></ion-spinner>'
+        });
         console.log('userData:', userData);
         var topic = {
             owner: userData._id,
@@ -243,7 +259,7 @@ function($scope, userData, $ionicHistory, $ionicPopup, Topics, $state, LocationS
             function() {
                 console.log('An error occured during sending new topic.');
             }
-        );
+        ).finally($ionicLoading.hide.bind($ionicLoading));
     };
 
 

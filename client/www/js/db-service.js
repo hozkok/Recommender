@@ -273,8 +273,8 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return deferred.promise;
     };
 
-    function sync_local_db (topics) {
-        function sync_topic (topic) {
+    function sync_local_db(topics) {
+        function sync_topic(topic) {
             return execute_sql('INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [topic._id,
                                   topic.owner.uname,
                                   topic.owner.phoneNum,
@@ -285,7 +285,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
                                   topic.destruct_date])
         }
 
-        function sync_participant (participant) {
+        function sync_participant(participant) {
             return execute_sql('INSERT OR IGNORE INTO participants (topic_id, uname, phone) VALUES (?, ?, ?)', [
                 participant.topic_id,
                 participant.uname,
