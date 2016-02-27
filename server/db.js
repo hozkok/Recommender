@@ -416,14 +416,12 @@ module.exports = {
         }
     },
 
-    
     get_topic_list: function(req, res) {
         console.log('get topics request ->', req.params.usr_id);
         get_topic_list(req.params.usr_id, function(topics) {
             res.json(topics);
         });
     },
-
 
     get_topic: function(req, res) {
         var topic_id = req.params.topic_id;
@@ -449,7 +447,7 @@ module.exports = {
             }
             console.log('user:', user);
             models.Topic.findByIdAndUpdate(req.params.topicId, {
-                $push: {participants: {user._id}}
+                $push: {participants: user._id}
             }, function (err, topic) {
                 if (err) {
                     console.log('err:', err);
