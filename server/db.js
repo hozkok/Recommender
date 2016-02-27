@@ -175,6 +175,7 @@ var get_topic_list = function(usr_id, callback) {
     models.Topic
         .find({$or: [{owner: usr_id}, {participants: usr_id}]})
         .populate('owner')
+        .populate('participants', 'phoneNum uname')
         .populate('messages')
         .exec(function(err, topics) {
             if(err || !topics) {
@@ -182,7 +183,17 @@ var get_topic_list = function(usr_id, callback) {
             }
             else {
                 if(callback) {
-                    callback(topics);
+                    models.Topic.populate(topics, {
+                        path: 'messages.sender',
+                        select: 'phoneNum uname',
+                        model: 'User'
+                    }, function(err, topics) {
+                        if (err) {
+                            res.sendStatus(500);
+                            return;
+                        }
+                        callback(topics);
+                    });
                 }
                 else {
                     console.log('you need to pass callback function!');
@@ -330,7 +341,11 @@ module.exports = {
             res.sendStatus(400);
         }
         else {
-            update_user(user_id, req.body, function() {
+            update_user(user_id, req.body, function(err) {
+                if (err) {
+                    console.log('update usr err:', err);
+                    return;
+                }
                 console.log(user_id, 'is updated.');
                 res.sendStatus(200);
             });
