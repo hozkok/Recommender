@@ -1,45 +1,48 @@
 recommender.factory('Contacts',
 ['$q', '$resource', 'BACKEND', '$cordovaContacts', 'userData', 'db',
-function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
-    var get_device_contacts = function() {
+function ($q, $resource, BACKEND, $cordovaContacts, userData, db) {
+    var get_device_contacts = function () {
         var deferred = $q.defer();
 
-        if(!window.cordova) {
+        if (!window.cordova) {
             deferred.resolve(['0892311229']);
             return deferred.promise;
         }
 
         $cordovaContacts.find({filter: '', multiple: true})
-        .then(function(contacts) {
+        .then(function (contacts) {
             var contacts_with_phone = contacts
-                .filter(function(contact) {
+                .filter(function (contact) {
                     return contact.phoneNumbers != null;
                 })
-                .map(function(contact) {
+                .map(function (contact) {
                     return {
                         phoneNumbers: contact.phoneNumbers.map(
-                                          function(phoneNumber) {
+                                          function (phoneNumber) {
                                               return phoneNumber.value;
                                           }),
                         name: contact.displayName
                     };
                 });
 
-            var phones = contacts_with_phone.reduce(function(nums, contact) {
-                var curr_nums = contact.phoneNumbers;
-                for(var i = 0; i < curr_nums.length; i++)
-                    nums.push(curr_nums[0].replace(/\s+/g, ''));
+            console.log('contacts_with_phone:', contacts_with_phone);
+
+            var phones = contacts_with_phone.reduce(function (nums, contact) {
+                contact.phoneNumbers.forEach(function (phone_num) {
+                    if (phone_num)
+                        nums.push(phone_num.replace(/\s+/g, ''));
+                });
                 return nums;
             }, []);
+            console.log('phones:', phones);
             deferred.resolve(phones);
-            //deferred.resolve(contacts_with_phone);
         });
 
         return deferred.promise;
     };
 
 
-    var check_contacts = function(contactList) {
+    var check_contacts = function (contactList) {
         console.log('attempting to check user contacts from server...');
         var contact_url = BACKEND.url + '/contacts/:user_id';
         return $resource(contact_url, {}, {get: {method: 'POST', isArray: true}})
@@ -57,18 +60,17 @@ function($q, $resource, BACKEND, $cordovaContacts, userData, db) {
                             .then(db.save_contacts);
 
 
-    db.get_contacts().then(function(contacts) {
-        if(contacts.length !== 0) {
+    db.get_contacts().then(function (contacts) {
+        if (contacts.length !== 0) {
             console.log('local db contacts not empty.');
             console.log(contacts);
             async_contacts.resolve(contacts);
-        }
-        else {
-            contacts_synced.then(function() {
-                db.get_contacts().then(function(contacts) {
-                    console.log(contacts);
-                    async_contacts.resolve(contacts);
-                });
+        } else {
+            contacts_synced
+            .then(db.get_contacts)
+            .then(function (contacts) {
+                console.log(contacts);
+                async_contacts.resolve(contacts);
             });
         }
     });

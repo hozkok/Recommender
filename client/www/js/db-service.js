@@ -25,17 +25,20 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         });
     };
 
-    var init_db = function() {
-        var db_prep = typeof(cordova) !== 'undefined' ? 
-            $cordovaSQLite.openDB(DB_CONF.name) :
-            window.openDatabase(DB_CONF.name, '1.0', 'Development db', 10*1024*1024); 
+    var init_db = function () {
+        var db_prep = (window.cordova)
+            ? $cordovaSQLite.openDB(DB_CONF.name) 
+            : window.openDatabase(DB_CONF.name,
+                                  '1.0',
+                                  'Development db',
+                                  10*1024*1024); 
         db_prep.transaction(populate_db,
             //err
-            function(err) {
+            function (err) {
                 console.log('sql transaction error:', err);
                 async_db.reason(err);
             },//success
-            function() {
+            function () {
                 console.log('db is initialized successfully!');
                 db = db_prep;
                 async_db.resolve(db_prep);
@@ -173,6 +176,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var save_contacts = function(contacts) {
+        if (!contacts) return $q.reject(new Error('Contacts empty.'));
         var query = 'INSERT OR IGNORE INTO contacts (name, phone) VALUES(?, ?)';
 
         contacts = contacts.map(function(contact) {
@@ -201,9 +205,9 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var save_participants = function(topic_id, participants) {
-        var query = 'INSERT OR IGNORE INTO participants (topic_id, phone) VALUES(?, ?)';
-        var sql_params = participants.map(function(phone) {
-            return [topic_id, phone];
+        var query = 'INSERT OR IGNORE INTO participants (topic_id, uname, phone) VALUES(?, ?, ?)';
+        var sql_params = participants.map(function(participant) {
+            return [topic_id, participant.uname, participant.phoneNum];
         });
         return exec_multiple_sql(query, sql_params);
     };
@@ -217,6 +221,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         var query = 'INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
         console.log('save_topic params:',topic);
 
+        // topic.participants = { uname, phoneNum }
         save_participants(topic._id, topic.participants)
         .then(function(results) {
             console.log('topic_id:', topic._id, 'save_participants is executed. results:', results);
@@ -268,6 +273,48 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return deferred.promise;
     };
 
+    function sync_local_db(topics) {
+        function sync_topic(topic) {
+            return execute_sql('INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [topic._id,
+                                  topic.owner.uname,
+                                  topic.owner.phoneNum,
+                                  topic.what,
+                                  topic.where,
+                                  topic.description,
+                                  topic.date,
+                                  topic.destruct_date])
+        }
+
+        function sync_participant(participant) {
+            return execute_sql('INSERT OR IGNORE INTO participants (topic_id, uname, phone) VALUES (?, ?, ?)', [
+                participant.topic_id,
+                participant.uname,
+                participant.phoneNum
+            ]);
+        }
+        
+        var db_operations = topics.reduce(function (acc_arr, topic) {
+            return acc_arr.concat(
+                [sync_topic(topic)],
+                topic.participants.map(
+                    function (participant) {
+                        return sync_participant({
+                            topic_id: topic._id,
+                            uname: participant.uname,
+                            phoneNum: participant.phoneNum
+                        });
+                    }
+                ),
+                topic.messages.map(
+                    function (message) {
+                        message.topic_id = topic._id;
+                        return save_message(message);
+                    }
+                )
+            );
+        }, []);
+        return $q.all(db_operations);
+    }
 
     return {
         init: init_db,
@@ -280,6 +327,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         save_topic: save_topic,
         save_message: save_message,
         get_topic: get_topic,
-        get_topic_list: get_topic_list
+        get_topic_list: get_topic_list,
+        sync_local_db: sync_local_db
     };
 }]);

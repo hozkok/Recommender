@@ -1,4 +1,4 @@
-recommender.run(['$ionicPlatform', 'db', '$state', 'userData', function($ionicPlatform, db, $state, userData) {
+recommender.run(['$ionicPlatform', 'db', '$state', 'userData', 'Topics', '$http', 'syncService', '$ionicLoading', function($ionicPlatform, db, $state, userData, Topics, $http, syncService, $ionicLoading) {
     console.log('running...');
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -12,24 +12,40 @@ recommender.run(['$ionicPlatform', 'db', '$state', 'userData', function($ionicPl
         if(window.StatusBar) {
             StatusBar.styleDefault();
         }
+
+        // initialize local database...
         db.init();
+
         var user_data = db.get_user_data();
-        user_data.then(function(result) {
+        user_data.then(function (result) {
             if(result.rows.length === 0) {
                 console.log('user not found');
                 $state.go('login');
-            }
-            else {
-                console.log('result:', result);
+            } else {
+                console.log('user_data result:', result);
                 userData._id = result.rows.item(0).id;
                 userData.phoneNum = result.rows.item(0).phone;
                 userData.name = result.rows.item(0).name;
 
-                $state.go('topicList', {
-                    phone: result.rows.item(0).phone,
-                    uid: result.rows.item(0).id}
-                );
+
+                $ionicLoading.show({
+                    template: '<ion-spinner></ion-spinner>'
+                });
+                syncService.sync_all()
+                .then(function (results) {
+                    console.log('SYNC LOCAL DB RESULTS:', results);
+                }, function (err) {
+                    console.log('SYNC LOCAL DB ERR:', err);
+                })
+                .finally(function () {
+                    $ionicLoading.hide();
+                    $state.go('topicList', {
+                        phone: result.rows.item(0).phone,
+                        uid: result.rows.item(0).id}
+                    );
+                });
             }
         });
+
     });
 }]);
