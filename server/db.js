@@ -192,6 +192,7 @@ var get_topic_list = function(usr_id, callback) {
                             res.sendStatus(500);
                             return;
                         }
+                        // console.log(topics);
                         callback(topics);
                     });
                 }
@@ -451,25 +452,39 @@ module.exports = {
     },
 
 
-    add_participant: function (req, res) {
-        if (!req.body.phoneNo)
-            return res.status(400).send('missing field: phoneNo');
-
-        models.User.findOne({phoneNum: req.body.phoneNo}, function (err, user) {
-            if (err) {
-                console.log('add participant err:', err);
-                return res.status(500).send(err);
-            }
-            console.log('user:', user);
-            models.Topic.findByIdAndUpdate(req.params.topicId, {
-                $push: {participants: user._id}
-            }, function (err, topic) {
+    add_participants: function (req, res) {
+        if (!req.body)
+            return res.status(400).send('no body received');
+        var phoneNums = req.body.map(function (p) {
+            return p.phone;
+        });
+        console.log('participant phones to be added:', phoneNums);
+        console.log('add participant topic:', req.params.topic_id);
+        models.User.find({phoneNum: {$in: phoneNums}}, function (err, users) {
                 if (err) {
-                    console.log('err:', err);
+                    console.log('add participant err:', err);
                     return res.status(500).send(err);
                 }
-            });
-        });
+                console.log('users:', users);
+                var user_ids = users.map(function (u) {
+                    return u._id;
+                });
+                models.Topic.findByIdAndUpdate(req.params.topic_id, {
+                    $addToSet: {participants: {$each: user_ids}}
+                }, function (err, topic) {
+                    console.log('err and topic', err, topic);
+                    if (err) {
+                        console.log('err:', err);
+                        return res.status(500).send(err);
+                    }
+                    console.log('participants are successfully added.', topic);
+                    push.pushParticipant(topic, users.map(function (u) {
+                        return u.pushToken;
+                    }));
+                    res.sendStatus(200);
+                });
+            }
+        );
 
     },
     

@@ -21,6 +21,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
             var sql_statement = 'CREATE TABLE IF NOT EXISTS ' + 
                                 table.name + '(' + attrs.join(',') + pk_expression + ')';
 
+            console.log(sql_statement);
             tx.executeSql(sql_statement);
         });
     };
@@ -179,6 +180,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         if (!contacts) return $q.reject(new Error('Contacts empty.'));
         var query = 'INSERT OR IGNORE INTO contacts (name, phone) VALUES(?, ?)';
 
+        console.log('save_contacts:', contacts);
         contacts = contacts.map(function(contact) {
             return [contact.uname, contact.phoneNum];
         });
@@ -213,12 +215,15 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
     };
 
     var get_participants = function(topic_id) {
-        var query = 'SELECT phone FROM participants WHERE topic_id = ?';
-        return execute_sql(query, [topic_id]);
+        var query = 'SELECT * FROM participants WHERE topic_id = ?';
+        return execute_sql(query, [topic_id])
+        .then(function (results) {
+            return $q.when(result_to_obj_arr(results));
+        });
     };
 
     var save_topic = function (topic) {
-        var query = 'INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
+        var query = 'INSERT OR REPLACE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
         console.log('save_topic params:',topic);
 
         // topic.participants = { uname, phoneNum }
@@ -275,18 +280,20 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
 
     function sync_local_db(topics) {
         function sync_topic(topic) {
-            return execute_sql('INSERT OR IGNORE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [topic._id,
+            console.log('sync topic:', topic);
+            return execute_sql('INSERT OR REPLACE INTO topics (id, owner_name, owner_phone, `what`, `where`, description, date, destruct_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [topic._id,
                                   topic.owner.uname,
                                   topic.owner.phoneNum,
                                   topic.what,
                                   topic.where,
                                   topic.description,
                                   topic.date,
-                                  topic.destruct_date])
+                                  topic.destruct_date]);
         }
 
         function sync_participant(participant) {
-            return execute_sql('INSERT OR IGNORE INTO participants (topic_id, uname, phone) VALUES (?, ?, ?)', [
+            console.log('participantttt', participant);
+            return execute_sql('INSERT OR REPLACE INTO participants (topic_id, uname, phone) VALUES (?, ?, ?)', [
                 participant.topic_id,
                 participant.uname,
                 participant.phoneNum
@@ -298,6 +305,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
                 [sync_topic(topic)],
                 topic.participants.map(
                     function (participant) {
+                        console.log('participant:', participant);
                         return sync_participant({
                             topic_id: topic._id,
                             uname: participant.uname,
@@ -328,6 +336,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         save_message: save_message,
         get_topic: get_topic,
         get_topic_list: get_topic_list,
+        get_participants: get_participants,
         sync_local_db: sync_local_db
     };
 }]);

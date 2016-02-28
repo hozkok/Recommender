@@ -48,7 +48,7 @@ recommender.constant('DB_CONF', {
                 {name: 'uname', type: 'text NOT NULL'},
                 {name: 'phone', type: 'text NOT NULL'}
             ],
-            primary_key: ['topic_id', 'phone']
+            primary_keys: ['topic_id', 'phone']
         }
     ]
 });

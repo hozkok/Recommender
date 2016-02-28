@@ -3,11 +3,6 @@ recommender.controller('topicListCtrl',
 function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPopover, syncService) {
     console.log('topicListCtrl is initialized successfully.');
     console.log('topicListCtrl uid param:', userData._id);
-
-    //Topics.query({user_id: userData._id}, function(topics) {
-    //    console.log(topics);
-    //    $scope.topics = topics;
-    //});
     
     $scope.$on('push:topic', function(event, push_topic) {
         // console.log('TopicListCtrl received broadcast push topic:', push_topic);
@@ -89,8 +84,8 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
 
 
 recommender.controller('topicCtrl', 
-['$scope', '$state', '$stateParams', '$resource', '$ionicHistory', 'db', 'Topic', 'userData', 'Message', '$ionicLoading',
-function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, userData, Message, $ionicLoading) {
+['$scope', '$state', '$stateParams', '$resource', '$ionicHistory', 'db', 'Topic', 'userData', 'Message', '$ionicLoading', 'Contacts', '$ionicPopup', '$q', 'syncService',
+function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, userData, Message, $ionicLoading, Contacts, $ionicPopup, $q, syncService) {
     console.log('topicCtrl is initialized successfully.');
     console.log('topic id:', $stateParams.topic_id);
     var topic_id = $stateParams.topic_id;
@@ -106,14 +101,39 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
         }
     });
 
-    db.get_topic(topic_id).then(function(topic) {
+    db.get_topic(topic_id).then(function (topic) {
         console.log('topic query result:', topic);
         $scope.topic = topic;
-    });
+        return $q.when(topic);
+    })
+    .then(function (topic) {
+        return $q.all([
+            db.get_messages(topic_id).then(function (messages) {
+                console.log('Topic Messages:', messages);
+                $scope.topic.messages = messages;
+                return $q.when(messages);
+            }),
 
-    db.get_messages(topic_id).then(function(messages) {
-        console.log('Topic Messages:', messages);
-        $scope.topic.messages = messages;
+            db.get_participants(topic_id).then(function (participants) {
+                console.log('Topic participants:', participants);
+                $scope.topic.participants = participants;
+                return $q.when(participants);
+            })
+        ]);
+    })
+    .then(function () {
+        $scope.topic.participants.forEach(function (p) {
+            p.checked = true;
+            p.isStatic = true;
+        });
+        if (!$scope.topic.participants.some(function (p) {return p.phone === $scope.topic.owner_phone;})) {
+            $scope.topic.participants.push({
+                uname: $scope.topic.owner_name + ' (owner)',
+                phone: $scope.topic.owner_phone,
+                checked: true,
+                isStatic: true
+            });
+        }
     });
 
     $scope.$on('push:message', function(push_message) {
@@ -127,6 +147,71 @@ function($scope, $state, $stateParams, $resource, $ionicHistory, db, Topic, user
     //});
 
     $scope.go_back = $ionicHistory.goBack;
+
+
+    $scope.add_participant = function () {
+        console.log('topic:', $scope.topic);
+        Contacts.then(function (contacts) {
+            console.log('contacts', contacts);
+            return $q.when($scope.topic.participants.concat(
+                contacts.filter(function(c) {
+                    // only get the contacts who are not already in participant list.
+                    return !$scope.topic.participants.some(
+                        function (p) {
+                            return c.phone === p.phone;
+                        }
+                    );
+                }).map(function (c) {
+                    return {
+                        uname: c.name,
+                        phone: c.phone
+                    };
+                })
+            ));
+        })
+        .then(function (participants_mixed_with_contacts) {
+            console.log('mixed', participants_mixed_with_contacts);
+            $scope.topic.participants = participants_mixed_with_contacts;
+            $ionicPopup.show({
+                title: '<h4>Add New Participants</h4>',
+                template: [
+                    '<ul class="list">',
+                        '<li class="item item-checkbox" ng-repeat="p in topic.participants">',
+                            '<label class="checkbox">',
+                                '<input type="checkbox" ng-model="p.checked" ng-disabled="p.isStatic"/>',
+                            '</label>',
+                            '{{p.uname}}',
+                        '</li>',
+                    '</ul>'
+                ].join(''),
+                scope: $scope,
+                buttons: [{
+                    text: 'Add participants',
+                    type: 'button-positive',
+                    onTap: function(e) {
+                        var new_participant_checker = function (p) {
+                            return p.checked && !p.isStatic;
+                        }
+                        var new_participants = $scope.topic.participants.filter(new_participant_checker);
+                        if (!new_participants.length) {
+                            console.log('no new participant selected.');
+                            return;
+                        }
+                        Topic.update({topic_id: $scope.topic.id}, new_participants)
+                        .$promise.then(function (res) {
+                            console.log('add participant response:', res);
+                            new_participants.forEach(function (p) {
+                                p.isStatic = true;
+                            });
+                            syncService.sync_all();
+                        }, function (err) {
+                            console.log('new participant err:', err);
+                        });
+                    }
+                }]
+            });
+        });
+    };
 
     $scope.$on('elastic:height-changed', function(event, msgHeight) {
         if(!msgHeight) return;

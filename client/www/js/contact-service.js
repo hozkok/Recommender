@@ -5,7 +5,7 @@ function ($q, $resource, BACKEND, $cordovaContacts, userData, db) {
         var deferred = $q.defer();
 
         if (!window.cordova) {
-            deferred.resolve(['0892311229']);
+            deferred.resolve(['0892311229', '0871234567', '0862345678', '0892345678']);
             return deferred.promise;
         }
 

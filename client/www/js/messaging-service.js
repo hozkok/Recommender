@@ -40,11 +40,21 @@ function($ionicPush, $rootScope, db, Login, userData) {
                             console.log('ERR: Topic couldnt be saved into db. ERR:', err);
                         }
                     );
+                    console.log('saving topic participants by gcm');
+                    db.save_participants(topic_payload.participants);
                 }
                 else if (notification.payload['gcm.notification.participant']) {
                     var participant_payload = notification.payload['gcm.notification.participant'];
                     console.log('push participant received:', participant_payload);
                     $rootScope.$broadcast('push:participant', participant_payload);
+                    db.save_topic(participant_payload).then(
+                        function (success) {
+                            console.log('participant - topic saved.');
+                        },
+                        function (err) {
+                            console.log('ERR: participant...', err);
+                        }
+                    );
                     db.new_participant(participant_payload).then(
                         function () {
                             console.log('New participant is successfully saved into db.');

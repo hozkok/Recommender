@@ -132,4 +132,21 @@ pushService.pushMessage = function(msg, tokens) {
     });
 };
 
+pushService.pushParticipant = function (topic, tokens) {
+    var message = new gcm.Message();
+    message.addData('message', 'You are added to a new topic: ' + topic.what);
+    message.addData('title', 'New Participant');
+    message.addData('msgcnt', '1');
+    message.addData('payload', {
+        '$state': 'topic',
+        '$stateParams': JSON.stringify({topic_id: topic._id})
+    });
+    message.addNotification('participant', topic);
+    gcmSender.send(message, tokens, 5, function (result) {
+        console.log(result === null
+                        ? 'GCM PUSH participant IS SUCCESSFULLY SENT'
+                        : result);
+    })
+};
+
 module.exports = pushService;

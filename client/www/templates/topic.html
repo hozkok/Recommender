@@ -2,7 +2,10 @@
     <ion-nav-title>{{topic.what}}</ion-nav-title>
 
     <ion-nav-buttons side="primary">
-        <button class="button-clear" ng-click="go_back()"><i class="ion-arrow-left-c"></i>Topics</button>
+        <button class="button-clear button-icon icon ion-chevron-left" ng-click="go_back()"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <button class="button-clear button-icon icon ion-android-person-add" ng-click="add_participant()"></button>
     </ion-nav-buttons>
 
     <ion-content>
