@@ -47,9 +47,6 @@ app.route('/topics/:usr_id?')
     .get(db.get_topic_list)
     .post(db.new_topic);
 
-// check user activity and send the activity to user.
-app.get('/activity/:usr_id', require('./activity-checker.js'));
-
 app.route('/topic/:topic_id?')
     .get(db.get_topic)
     .put(db.add_participants);
