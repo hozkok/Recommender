@@ -210,7 +210,7 @@ var get_user_push_tokens = function(numbers, find_in, callback) {
     // TODO: find and return the pushTokens for the given numbers
     var query = {};
     query[find_in] = {$in: numbers};
-    models.User.find(query).select('pushToken')
+    models.User.find(query)
     .exec(function(err, users) {
         if(err | !users) {
             console.log('cannot find users.');
@@ -381,7 +381,7 @@ module.exports = {
                         description: saved_topic.description,
                         date: saved_topic.date,
                         destruct_date: saved_topic.destruct_date,
-                        participants: participant_phones
+                        participants: users
                     };
                     console.log('push_obj:', push_obj);
 
