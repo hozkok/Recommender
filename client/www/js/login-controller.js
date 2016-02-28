@@ -40,6 +40,7 @@ function($scope, $resource, db, $state, $http, $rootScope, $ionicPush, Login, us
             db.insert_user(usr._id, usr.phoneNum, usr.uname)
             .then(function(result) {
                 angular.extend(userData, usr);
+                userData.name = usr.uname;
                 $state.go('topicList', {uid: usr._id, phone: usr.phoneNum});
             }, function(err) {console.log('Error:', err)});
         };
