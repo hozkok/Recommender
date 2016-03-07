@@ -278,6 +278,17 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         return deferred.promise;
     };
 
+    var delete_topic = function (topic_id) {
+        var queries = [
+            'DELETE FROM topics WHERE id = ?',
+            'DELETE FROM messages WHERE topic_id = ?',
+            'DELETE FROM participants WHERE topic_id = ?'
+        ];
+        return $q.all(queries.map(function (q) {
+            return execute_sql(q, [topic_id]);
+        }));
+    };
+
     function sync_local_db(topics) {
         function sync_topic(topic) {
             console.log('sync topic:', topic);
@@ -337,6 +348,7 @@ recommender.factory('db', ['DB_CONF', '$cordovaSQLite', '$q', function(DB_CONF, 
         get_topic: get_topic,
         get_topic_list: get_topic_list,
         get_participants: get_participants,
-        sync_local_db: sync_local_db
+        sync_local_db: sync_local_db,
+        delete_topic: delete_topic
     };
 }]);

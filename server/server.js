@@ -60,8 +60,14 @@ app.route('/contacts/:usr_id?')
     .post(db.get_contact_list)
     .get(db.get_contact_list);
 
+app.get('/datenow', (req, res) => {
+    res.send({time: Date.now()});
+});
 
 app.use('/api', router);
+
+var destruct_checker = require('./destruct-checker.js');
+destruct_checker.init();
 
 // app.route('/login')
 // .post(function (req, res) {

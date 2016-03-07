@@ -1,4 +1,4 @@
-recommender.run(['$ionicPlatform', 'db', '$state', 'userData', 'Topics', '$http', 'syncService', '$ionicLoading', function($ionicPlatform, db, $state, userData, Topics, $http, syncService, $ionicLoading) {
+recommender.run(['$ionicPlatform', 'db', '$state', 'userData', 'Topics', '$http', 'syncService', '$ionicLoading', 'destructService', function($ionicPlatform, db, $state, userData, Topics, $http, syncService, $ionicLoading, destructService) {
     console.log('running...');
     $ionicPlatform.ready(function() {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -15,6 +15,8 @@ recommender.run(['$ionicPlatform', 'db', '$state', 'userData', 'Topics', '$http'
 
         // initialize local database...
         db.init();
+
+        destructService.init();
 
         var user_data = db.get_user_data();
         user_data.then(function (result) {

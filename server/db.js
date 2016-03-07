@@ -95,6 +95,21 @@ var new_user = function(name, phone, callback) {
     });
 };
 
+// var delete_topic = function (topic_id, cb) {
+//     models.Topic.findById(topic_id, function (err, topic) {
+//         if (err) {
+//             return err;
+//         }
+//         models.Message.remove({_id: {$in: topic.messages}}, function (err) {
+//             console.log('messages removed.');
+//             topic.remove(function (err) {
+//                 if (cb) {
+//                     cb();
+//                 }
+//             });
+//         });
+//     });
+// };
 
 //var new_topic = function(attrs) {
 //    if(!attrs.owner || !attrs.what) {
@@ -514,7 +529,6 @@ module.exports = {
             });
         }
     },
-
 
     raw: {
         new_user: new_user,
