@@ -16,6 +16,13 @@ function($scope, $state, userData, $resource, db, Topics, PushService, $ionicPop
             destruct_date: push_topic.destruct_date
         });
     });
+    $scope.$on('push:participant', function (event) {
+        syncService.sync_all()
+        .then(db.get_topic_list)
+        .then(function (topics) {
+            $scope.topics = topics;
+        });
+    });
 
     db.get_topic_list().then(function (topics) {
         console.log('All Topics:', topics);
