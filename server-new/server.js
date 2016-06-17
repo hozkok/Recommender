@@ -11,12 +11,20 @@ dotenv.config({path: '.env-variables'});
 
 const server = express();
 
-if (process.env.NODE_ENV === 'test') {
+switch (process.env.NODE_ENV) {
+case 'test':
     const errorHandler = require('errorhandler');
     server.use(errorHandler());
-    server.use(logger('dev'));
+    //server.use(logger('dev'));
+    break;
+case 'production':
+    server.use(logger('combined', {
+        stream: './log/all.log'
+    }));
+    break;
+default:
+    throw Error('invalid NODE_ENV');
 }
-
 
 server.set('port', process.env.PORT || 8000);
 

@@ -1,15 +1,13 @@
 const populateUser = require('../../middlewares/populate-user.js');
+const validators = require('../../middlewares/validators.js');
 const router = require('express').Router({
     mergeParams: true
 });
 const User = require('../../models/user.js');
-router.post('/user/register', (req, res, next) => {
-    req.checkBody('phoneNum', 'phoneNum missing.').notEmpty();
-    req.checkBody('uname', 'uname missing.').notEmpty();
-    const errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).send(errors);
-    }
+
+router.post('/user/register',
+            validators.checkMissings(['phoneNum', 'uname']),
+            (req, res, next) => {
     const user = new User(req.body);
     user.save()
         .then(result => res.status(200).send(result))
@@ -23,20 +21,16 @@ router.post('/user/register', (req, res, next) => {
             }
         });
 });
+
 router.post('/user/deregister', populateUser, (req, res, next) => {
-    if (!req.user) {
-        return res.status(400).send('user not found.');
-    }
     req.user.remove()
         .then(result => res.sendStatus(200))
         .catch(err => res.status(500).send(err));
 });
-router.post('/user/login', (req, res, next) => {
-    req.checkBody('phoneNum', 'phoneNum missing.').notEmpty();
-    let errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).send(errors);
-    }
+
+router.post('/user/login',
+            validators.checkMissings(['phoneNum']),
+            (req, res, next) => {
     User.findOne({phoneNum: req.body.phoneNum})
         .then(user => {
             if (!user) {
@@ -46,15 +40,15 @@ router.post('/user/login', (req, res, next) => {
         })
         .catch(err => res.status(500).send(err));
 });
-router.put('/user/update-push-token', populateUser, (req, res, next) => {
-    req.checkBody('pushToken', 'pushToken needed.');
-    const errors = req.validationErrors();
-    if (!errors) {
-        return res.status(400).send(errors);
-    }
+
+router.put('/user/update-push-token',
+           populateUser,
+           validators.checkMissings(['pushToken']),
+           (req, res, next) => {
     req.user.pushToken = req.body.pushToken;
     req.user.save()
         .then(result => res.status(200).send(result))
         .catch(err => res.status(500).send(err));
 });
+
 module.exports = router;

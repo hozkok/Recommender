@@ -2,17 +2,66 @@ const path = require('path');
 const server = require('../server');
 const supertest = require('supertest');
 
-// it will run before all the tests
+let testData = {
+    users: [
+        {
+            uname: 'globalTester1',
+            phoneNum: '1111111'
+        },
+        {
+            uname: 'globalTester2',
+            phoneNum: '2222222'
+        }
+    ],
+    topic: {
+        what: 'testWhat',
+        where: 'testWhere',
+        description: 'testDescription',
+        participants: ['']
+    }
+};
+
 let request;
+// it will run before all the tests
 before(() => {
-    return require('../server').then(server => {
-        request = supertest(server);
-    });
+    return require('../server')
+        .then(server => {
+            request = supertest(server);
+            return Promise.all(testData.users.map(user => new Promise(
+                (resolve, reject) => {
+                    request.post('/user/register')
+                        .send(user)
+                        .expect(200)
+                        .end((err, res) => {
+                            if (err) {
+                                reject();
+                            } else {
+                                user._id = res.body._id;
+                                resolve();
+                            }
+                        });
+                }
+            )));
+        });
 });
 
 // it will run after all the tests
-after(done => {
-    done();
+after(() => {
+    return Promise.all(testData.users.map(user => new Promise(
+        (resolve, reject) => {
+            request.post('/user/deregister')
+                .send({user})
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        reject();
+                    } else {
+                        delete user._id;
+                        resolve();
+                    }
+                });
+        }
+    )));
 });
 
 describe('/user', () => {
@@ -52,7 +101,14 @@ describe('/user', () => {
     });
 
     describe('/user/update-push-token', () => {
-        it('should update push token.');
+        it('should update push token.', done => {
+            request.put('/user/update-push-token')
+                .send({
+                    user: {_id: registeredUserId},
+                    pushToken: 'samplePushToken'
+                })
+                .expect(200, done);
+        });
     });
 
     describe('/deregister', () => {
