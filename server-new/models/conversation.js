@@ -11,7 +11,7 @@ const Conversation = mongoose.model('Conversation', {
     parentTopic: {type: ObjectId, required: true}, //topic id
 
     // number of times the topic is referenced.
-    shareDegree: {type: Number, default: 1},
+    shareDegree: {type: Number, default: 1, set: (deg => deg + 1)},
 
     messages: [{
         text: {type: String, required: true},

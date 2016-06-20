@@ -11,6 +11,10 @@ let testData = {
         {
             uname: 'globalTester2',
             phoneNum: '2222222'
+        },
+        {
+            uname: 'globalTester3',
+            phoneNum: '3333333'
         }
     ],
     topic: {
@@ -120,6 +124,7 @@ describe('/user', () => {
     });
 });
 
+let savedTopic;
 describe('/topics', () => {
     describe('/ [POST]', () => {
         const testTopic = {
@@ -135,6 +140,7 @@ describe('/topics', () => {
                 .expect(200)
                 .end((err, res) => {
                     if (err) return done(err);
+                    savedTopic = res.body.savedTopic;
                     done();
                 });
         });
@@ -161,6 +167,51 @@ describe('/topics', () => {
         it('should create a new conversation with user[s].');
         describe('/:conversationId/messages [POST]', () => {
             it('should post a new message.');
+        });
+    });
+});
+
+describe('/conversations', () => {
+    const testConversation = {
+        user: testData.users[0],
+        participant: testData.users[2],
+        addedBy: testData.users[0],
+    };
+    describe('/ [POST]', () => {
+        it('should create a new conversation.', done => {
+            testConversation.parentTopic = savedTopic;
+            request.post('/conversations')
+                .send(testConversation)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) {
+                        return done(err);
+                    }
+                    testConversation._id = res.body._id;
+                    done();
+                });
+        });
+    });
+
+    describe('/:conversationId [GET]', () => {
+        it('should get the conversation with specified id.', done => {
+            request.get(`/conversations/${testConversation._id}`)
+                .expect(200, done);
+        });
+    });
+
+    describe('/:conversationId/messages [POST]', () => {
+        let testMsg = {
+            text: 'this is a test message.',
+            sender: testData.users[0]
+        };
+        it('should post a new message on conversation', done => {
+            request.post(`/conversations/${testConversation._id}/messages`)
+                .send(testMsg)
+                .expect(200)
+                .end((err, res) => {
+                    done(err);
+                });
         });
     });
 });
