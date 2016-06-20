@@ -17,7 +17,7 @@ let testData = {
         what: 'testWhat',
         where: 'testWhere',
         description: 'testDescription',
-        participants: ['']
+        participants: []
     }
 };
 
@@ -122,14 +122,42 @@ describe('/user', () => {
 
 describe('/topics', () => {
     describe('/ [POST]', () => {
-        it('should create topic.');
+        const testTopic = {
+            user: testData.users[0],
+            what: 'testWhat',
+            where: 'testWhere',
+            description: 'testDescription',
+            participants: [testData.users[1]]
+        };
+        it('should create topic.', done => {
+            request.post('/topics/')
+                .send(testTopic)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) return done(err);
+                    done();
+                });
+        });
         it('should fail if "what" field is missing.');
         it('should fail if "where" field is missing.');
         it('should fail if "description" field is missing.');
         it('should fail if "participants" field is missing.');
     });
 
-    describe('/:topicId/conversations [POST]', () => {
+    describe('/ [GET]', () => {
+        it('should get all the topics of user.', done => {
+            request.get('/topics/')
+                .send({user: testData.users[0]})
+                .expect(200)
+                .end((err, res) => {
+                    if (err) return done(err);
+                    //console.log('res.body:', res.body);
+                    done();
+                });
+        });
+    });
+
+    describe('/conversations [POST]', () => {
         it('should create a new conversation with user[s].');
         describe('/:conversationId/messages [POST]', () => {
             it('should post a new message.');

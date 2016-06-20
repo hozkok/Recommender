@@ -2,20 +2,12 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const Topic = mongoose.model('Topic', {
-    creator: ObjectId, //user id
-    what: String,
-    where: String,
-    description: String,
+    creator: {type: ObjectId, required: true}, //user id
+    what: {type: String, required: true},
+    where: {type: String, required: true},
+    description: {type: String, required: true},
     destructTimer: Date,
-    conversations: [{
-        participant: ObjectId, //user id
-        degreeOfSeperation: Number, //distance between two users
-        messages: [{
-            text: String,
-            isSenderOP: Boolean,
-            isDelivered: Boolean
-        }]
-    }]
+    conversations: [ObjectId] // conversation id
 });
 
 module.exports = Topic;
