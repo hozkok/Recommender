@@ -7,7 +7,7 @@ const router = require('express').Router({
     mergeParams: true
 });
 
-router.get('/topics',
+router.get('/',
            populateUser,
            (req, res, next) => {
     Topic.find({creator: req.user._id})
@@ -15,7 +15,7 @@ router.get('/topics',
         .catch(err => res.status(500).send(err));
 });
 
-router.post('/topics',
+router.post('/',
             populateUser,
             validator.checkMissings([
                 'what', 'where',

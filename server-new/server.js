@@ -33,9 +33,7 @@ server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
 server.use(expressValidator());
 
-
-const controllers = require('./controllers');
-controllers.applyTo(server);
+server.use('/', require('./controllers'));
 
 module.exports = mongoose.connect(process.env.MONGO_PATH)
     .then(() => new Promise((resolve ,reject) => {

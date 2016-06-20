@@ -5,7 +5,7 @@ const router = require('express').Router({
 });
 const User = require('../../models/user.js');
 
-router.post('/user/register',
+router.post('/register',
             validators.checkMissings(['phoneNum', 'uname']),
             (req, res, next) => {
     const user = new User(req.body);
@@ -22,13 +22,13 @@ router.post('/user/register',
         });
 });
 
-router.post('/user/deregister', populateUser, (req, res, next) => {
+router.post('/deregister', populateUser, (req, res, next) => {
     req.user.remove()
         .then(result => res.sendStatus(200))
         .catch(err => res.status(500).send(err));
 });
 
-router.post('/user/login',
+router.post('/login',
             validators.checkMissings(['phoneNum']),
             (req, res, next) => {
     User.findOne({phoneNum: req.body.phoneNum})
@@ -41,7 +41,7 @@ router.post('/user/login',
         .catch(err => res.status(500).send(err));
 });
 
-router.put('/user/update-push-token',
+router.put('/update-push-token',
            populateUser,
            validators.checkMissings(['pushToken']),
            (req, res, next) => {
