@@ -1,0 +1,10 @@
+{
+    "name": "RecommenderApp",
+    "app_id": "",
+    "proxies": [
+        {
+          "path": "/localhost/",
+          "proxyUrl": "http://localhost:3000/"
+        }
+    ]
+}
