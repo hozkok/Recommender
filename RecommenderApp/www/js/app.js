@@ -13,7 +13,7 @@ angular.module('recommender', [
     'LocalForageModule',
 ])
 
-.run(function ($ionicPlatform, $state, mainService) {
+.run(function ($ionicPlatform, $state, mainService, data) {
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -25,9 +25,10 @@ angular.module('recommender', [
         mainService.init()
             .then((results) => {
                 console.log(`results: ${results}`);
-                $state.go('login');
+                $state.go(data.user
+                    ? 'topics'
+                    : 'login');
             });
-        $state.go('login');
     });
 })
 

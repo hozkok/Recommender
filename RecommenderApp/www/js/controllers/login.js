@@ -1,5 +1,5 @@
 angular.module('recommender.controllers')
-.controller('loginCtrl', function ($scope, login, info, $localForage, $state) {
+.controller('loginCtrl', function ($scope, login, info, $localForage, $state, data) {
     $scope.credentials = {};
     $scope.login = () => {
         loginAndSavePromise = login($scope.credentials)
@@ -8,7 +8,8 @@ angular.module('recommender.controllers')
             successMessage: 'login success.',
             errorMessage: 'could not login.'
         })
-        .then(result => {
+        .then(userData => {
+            data.user = userData;
             $state.go('topics');
         });
     };
