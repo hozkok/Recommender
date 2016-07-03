@@ -1,0 +1,46 @@
+<ion-view view-title="New Topic">
+    <ion-nav-buttons side="right">
+        <a
+            class="button button-icon icon ion-checkmark-round"
+            ng-disabled="topicNotValid"
+            ng-click="sendTopic(topic)"></a>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <ion-list>
+            <label class="item item-input item-stacked-label">
+                <span>What</span>
+                <input
+                    type="text"
+                    ng-model="topic.what"
+                    placeholder="type your need..."
+                    ng-change="checkTopicData(topic)"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Where</span>
+                <input
+                    ion-autocomplete
+                    type="text" 
+                    class="ion-autocomplete"
+                    max-selected-items="1"
+                    placeholder="type place name here"
+                    ng-model="topic.where"
+                    items-method="getWhat(query)"
+                    items-clicked-method="checkTopicData(topic)"
+                    items-removed-method="checkTopicData(topic)"
+                    selected-items-label="Selected Place"
+                    select-items-label="Select a place..."
+                    cancel-button-label="Cancel"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span>Description</span>
+                <input
+                    type="text"
+                    ng-model="topic.description"
+                    placeholder="type description..."
+                    ng-change="checkTopicData(topic)"/>
+            </label>
+        <ion-list>
+            <button class="button button-positive add-participants-button" ng-click="addParticipants()">Add Participants</button>
+            <button class="button button-assertive add-participants-button" ng-click="pickDestructDate()">Pick Destruct Date</button>
+    </ion-content>
+</ion-view>

@@ -3,7 +3,7 @@
     "app_id": "",
     "proxies": [
         {
-          "path": "/localhost/",
+          "path": "/localhost",
           "proxyUrl": "http://localhost:3000/"
         }
     ]

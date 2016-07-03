@@ -1,6 +1,6 @@
 angular.module('recommender.services', [])
 
-.factory('mainService', function ($q, contacts, login, data) {
+.factory('mainService', function ($q, contacts, login, dataService) {
 
     function initAll(services) {
         return $q.all(services.map(service => service.init()));
@@ -9,8 +9,7 @@ angular.module('recommender.services', [])
     return {
         init() {
             return initAll([
-                contacts,
-                data,
+                dataService,
             ]);
         },
     };

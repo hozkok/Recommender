@@ -1,1 +1,8 @@
-/* Empty. Add your own CSS if you like */
+.button-clear.button-clear {
+    color: blue
+}
+
+.add-participants-button {
+    margin-top: 20px;
+    margin-right: 20px;
+}

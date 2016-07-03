@@ -1,6 +1,6 @@
 angular.module('recommender.services')
 
-.factory('data', function ($localForage) {
+.factory('dataService', function ($localForage) {
 // the app data (user data, metadata etc.) will be stored
 // in that angular value object.
     var data = {};
@@ -20,11 +20,11 @@ angular.module('recommender.services')
         init,
 
         get(key) {
-            return data.key;
+            return data[key];
         },
 
         set(key, val) {
-            data.key = val;
+            data[key] = val;
         }
     };
 });

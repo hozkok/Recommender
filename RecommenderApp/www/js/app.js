@@ -6,14 +6,16 @@
 angular.module('recommender', [
     'ionic',
     'ngCordova',
+    'ion-autocomplete',
+    'ionic-datepicker',
+    'LocalForageModule',
     'recommender.services',
     'recommender.controllers',
     'recommender.routes',
     'recommender.config',
-    'LocalForageModule',
 ])
 
-.run(function ($ionicPlatform, $state, mainService, data) {
+.run(function ($ionicPlatform, $state, mainService, dataService, sync, info) {
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -23,11 +25,14 @@ angular.module('recommender', [
             StatusBar.styleDefault();
         }
         mainService.init()
-            .then((results) => {
-                console.log(`results: ${results}`);
-                $state.go(data.user
-                    ? 'topics'
-                    : 'login');
+            .then(results => {
+                console.log(`results:`, results);
+                if (dataService.get('user')) {
+                    sync.all();
+                    $state.go('topics');
+                } else {
+                    $state.go('login');
+                }
             });
     });
 })
@@ -42,6 +47,7 @@ angular.module('recommender', [
 .config(function ($localForageProvider) {
     $localForageProvider.config({
         version: 1.0,
+        name: 'recommender',
         description: 'recommender offline storage'
     });
 });

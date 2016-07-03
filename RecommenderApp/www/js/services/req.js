@@ -1,16 +1,31 @@
 angular.module('recommender.services')
-.factory('req', function ($http, $q, config, utils) {
+.factory('req', function ($http, $q, config, utils, dataService) {
     var baseUrl = config.baseUrl,
+        appHeaders = {};
 
-        post = function (path, data, opts) {
-            console.log(utils.joinPaths([baseUrl, path]));
-            var httpProps = {
-                    url: utils.joinPaths([baseUrl, path]),
-                    method: 'POST',
-                    data: data
-                };
-            return $http(httpProps);
-        };
+    function prepHeader(obj) {
+        var userData = dataService.get('user');
+        return Object.assign({}, appHeaders, {
+            'x-recommender-user': userData ? userData._id : undefined
+        }, obj);
+    }
+
+    function post(path, data, opts) {
+        path = utils.joinPaths([baseUrl, path]);
+        console.log(path, 'POST');
+        var httpProps = {
+                url: path,
+                method: 'POST',
+                headers: prepHeader(),
+                data: Object.assign({},
+                                    {user: dataService.get('user')},
+                                    data)
+            };
+        return $http(httpProps).catch(err => {
+            console.error(err);
+            return $q.reject(err);
+        });
+    }
 
     return {
         init: function () {
@@ -20,12 +35,17 @@ angular.module('recommender.services')
         post,
 
         get(path) {
-            var headers = Object.assign({}, appHeaders),
-                httpProps = {
-                    url: utils.joinPaths([baseUrl, path]),
+            path = utils.joinPaths([baseUrl, path]);
+            console.log(path, 'GET');
+            var httpProps = {
+                    url: path,
                     method: 'GET',
+                    headers: prepHeader(),
                 };
-            return $http(httpProps);
+            return $http(httpProps).catch(err => {
+                console.error(err);
+                return $q.reject(err);
+            });
         },
     };
 });

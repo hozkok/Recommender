@@ -10,5 +10,10 @@ angular.module('recommender.routes', [])
                 url: '/topics',
                 templateUrl: 'templates/topic-list.html',
                 controller: 'topicListCtrl'
+            })
+            .state('new-topic', {
+                url: '/new-topic',
+                templateUrl: 'templates/new-topic.html',
+                controller: 'newTopicCtrl'
             });
     });
