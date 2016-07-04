@@ -22,7 +22,7 @@
                     type="text" 
                     class="ion-autocomplete"
                     max-selected-items="1"
-                    placeholder="type place name here"
+                    placeholder="type place name..."
                     ng-model="topic.where"
                     items-method="getWhat(query)"
                     items-clicked-method="checkTopicData(topic)"
@@ -39,8 +39,11 @@
                     placeholder="type description..."
                     ng-change="checkTopicData(topic)"/>
             </label>
+            <ion-item class="assertive" ng-click="pickDestructDate()">
+                Destruct Date:
+                <span class="item-note">{{topic.destructDate | date:'d MMM  y'}}</span>
+            </ion-item>
         <ion-list>
-            <button class="button button-positive add-participants-button" ng-click="addParticipants()">Add Participants</button>
-            <button class="button button-assertive add-participants-button" ng-click="pickDestructDate()">Pick Destruct Date</button>
+        <button class="button button-positive add-participants-button" ng-click="addParticipants()">Add Participants</button>
     </ion-content>
 </ion-view>

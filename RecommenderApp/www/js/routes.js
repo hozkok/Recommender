@@ -6,12 +6,27 @@ angular.module('recommender.routes', [])
                 templateUrl: 'templates/login.html',
                 controller: 'loginCtrl'
             })
-            .state('topics', {
+            .state('tab', {
+                url: '/tab',
+                templateUrl: 'templates/tab-container.html',
+                abstract: true,
+            })
+            .state('tab.topics', {
                 url: '/topics',
                 templateUrl: 'templates/topic-list.html',
                 controller: 'topicListCtrl'
             })
-            .state('new-topic', {
+            .state('tab.topic', {
+                url: '/topics/:id',
+                templateUrl: 'templates/topic.html',
+                controller: 'topicCtrl'
+            })
+            .state('tab.responses', {
+                url: '/responses',
+                templateUrl: 'templates/response-list.html',
+                controller: 'responseListCtrl'
+            })
+            .state('tab.newTopic', {
                 url: '/new-topic',
                 templateUrl: 'templates/new-topic.html',
                 controller: 'newTopicCtrl'

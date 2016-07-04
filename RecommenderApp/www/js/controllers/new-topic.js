@@ -4,7 +4,9 @@ angular.module('recommender.controllers')
     $scope.topicNotValid = true;
 
     function getWhat(query, isInitializing) {
-        console.log('query:', query);
+        if (!query) {
+            return;
+        }
         return $localForage.getItem('/where-list')
             .then(data => {
                 return [query, ...data.counties.filter(
@@ -15,10 +17,12 @@ angular.module('recommender.controllers')
     $scope.getWhat = getWhat;
 
     function pickDestructDate() {
+        var tomorrow = new Date(Date.now() + (24*60*60*1000));
         ionicDatePicker.openDatePicker({
-            from: Date.now(),
+            inputDate: tomorrow,
+            from: tomorrow,
             callback: function (val) {
-                $scope.destructDate = val;
+                $scope.topic.destructDate = val;
                 console.log(Date(val));
             }
         });
@@ -27,12 +31,13 @@ angular.module('recommender.controllers')
 
     function checkTopicData(topic) {
         function checkAttr(attr) {
-            return topic[attr]
+            var isValid = (topic[attr] &&
+                (!Array.isArray(topic[attr]) || topic[attr].length !== 0));
+            return isValid
                 ? $q.resolve({attr})
                 : $q.reject(`${attr} field cannot be empty.`);
         }
-
-        var attrs = ['what', 'where', 'description'];
+        var attrs = ['what', 'where', 'description', 'participants'];
         return $q.all(attrs.map(attr => checkAttr(attr)))
             .then(results => {
                 console.log('checkTopicData results:', results);
@@ -64,6 +69,12 @@ angular.module('recommender.controllers')
                 errorMessage: undefined,
         })
         .then(result => {
+            console.log('new-topic result:', result);
+            var savedTopic = result.data.savedTopic;
+            return utils.instance('/topics')
+                .setItem(savedTopic._id, savedTopic);
+        })
+        .then(result => {
             $ionicHistory.goBack();
         });
     }
@@ -89,9 +100,11 @@ angular.module('recommender.controllers')
                             text: 'Ok',
                             type: 'button-positive',
                             onTap: event => {
-                                console.log('ehircik', scope.contacts);
-                                $scope.topic.participants = scope.contacts
+                                scope.topic.participants = scope.contacts
                                     .filter(c => c.checked);
+                                console.log('selected participants:',
+                                            scope.topic.participants);
+                                checkTopicData(scope.topic);
                             }
                         },
                     ]

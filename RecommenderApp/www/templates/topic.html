@@ -1,19 +1,18 @@
-<ion-view view-title="My Topics" cache-view="false">
-    <ion-nav-buttons side="right">
-        <a class="button button-icon icon ion-plus-round" ui-sref="tab.newTopic"></a>
-    </ion-nav-buttons>
+<ion-view view-title="Topic" cache-view="false">
     <ion-content class="padding">
         <ion-refresher
             pulling-text="Pull to refresh topics..."
-            on-refresh="syncTopics()">
+            on-refresh="syncTopic(topic)">
         </ion-refresher>
+        <strong>What: </strong> {{topic.what}}</br>
+        <strong>Where: </strong> {{topic.where}}</br>
+        <strong>Description: </strong> {{topic.description}}
+        <strong>Destruct Date: </strong>{{topic.destructDate || 'N/A'}}</br>
+        Responses:
         <ion-list>
             <ion-item
                 ng-repeat="topic in topics"
                 href="#/tab/topics/{{topic._id}}">
-                <strong>What:</strong> {{topic.what}}</br>
-                <strong>Where:</strong> {{topic.where}}</br>
-                <strong>Description:</strong> {{topic.description}}
                 <div class="item-icon-right">
                     <i class="icon ion-chevron-right"></i>
                 </div>

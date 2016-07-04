@@ -26,10 +26,10 @@ angular.module('recommender', [
         }
         mainService.init()
             .then(results => {
-                console.log(`results:`, results);
+                console.log(`mainService init results:`, results);
                 if (dataService.get('user')) {
                     sync.all();
-                    $state.go('topics');
+                    $state.go('tab.topics');
                 } else {
                     $state.go('login');
                 }
