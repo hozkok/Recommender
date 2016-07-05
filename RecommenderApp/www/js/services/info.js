@@ -1,7 +1,17 @@
 angular.module('recommender.services')
 .factory('info', function ($cordovaToast, config, $ionicLoading, $timeout, $q) {
     return {
-        show: (msg) => $cordovaToast.show(msg, 'short', 'bottom'),
+        show: (msg) => {
+            if (window.cordova) {
+                $cordovaToast.show(msg, 'short', 'bottom');
+            } else {
+                $ionicLoading.show({
+                    template: msg,
+                });
+                $timeout($ionicLoading.hide.bind($ionicLoading), 1500);
+            }
+        },
+
         loading_: (promise, successMsg, errMsg, infoDuration) => {
             infoDuration = (infoDuration !== undefined)
                 ? infoDuration

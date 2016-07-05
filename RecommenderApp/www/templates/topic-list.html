@@ -7,6 +7,12 @@
             pulling-text="Pull to refresh topics..."
             on-refresh="syncTopics()">
         </ion-refresher>
+        <div
+            ng-if="topics.length === 0"
+            style="margin-top: 20px; text-align: center;"
+            >
+            No topics to show.
+        </div>
         <ion-list>
             <ion-item
                 ng-repeat="topic in topics"

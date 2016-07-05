@@ -40,8 +40,8 @@
                     ng-change="checkTopicData(topic)"/>
             </label>
             <ion-item class="assertive" ng-click="pickDestructDate()">
-                Destruct Date:
-                <span class="item-note">{{topic.destructDate | date:'d MMM  y'}}</span>
+                Destruct Date: <strong>{{topic.destructDate || 'Pick date' | date:'d MMM  y'}}</strong>
+                <span class="item-note"></span>
             </ion-item>
         <ion-list>
         <button class="button button-positive add-participants-button" ng-click="addParticipants()">Add Participants</button>

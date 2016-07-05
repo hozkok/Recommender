@@ -25,6 +25,11 @@ angular.module('recommender.services')
             } catch(e) {
                 return $localForage.instance(props.name ? props.name : props);
             }
-        }
+        },
+
+        //extract date from mongodb object id
+        objIdToDate(objId) {
+            return new Date(parseInt(objId.substring(0, 8), 16) * 1000);
+        },
     };
 });

@@ -1,21 +1,30 @@
 <ion-view view-title="Topic" cache-view="false">
+    <ion-nav-buttons side="right">
+        <a class="button button-icon icon ion-android-person-add" ng-click="addParticipants()"></a>
+    </ion-nav-buttons>
     <ion-content class="padding">
         <ion-refresher
-            pulling-text="Pull to refresh topics..."
-            on-refresh="syncTopic(topic)">
+            pulling-text="Pull to refresh the topic..."
+            on-refresh="syncTopic()">
         </ion-refresher>
-        <strong>What: </strong> {{topic.what}}</br>
-        <strong>Where: </strong> {{topic.where}}</br>
-        <strong>Description: </strong> {{topic.description}}
-        <strong>Destruct Date: </strong>{{topic.destructDate || 'N/A'}}</br>
-        Responses:
         <ion-list>
-            <ion-item
-                ng-repeat="topic in topics"
-                href="#/tab/topics/{{topic._id}}">
-                <div class="item-icon-right">
-                    <i class="icon ion-chevron-right"></i>
-                </div>
+            <ion-item>
+                <strong>What: </strong> {{topic.what}}</br>
+            </ion-item>
+            <ion-item>
+                <strong>Where: </strong> {{topic.where}}</br>
+            </ion-item>
+            <ion-item>
+                <strong>Description: </strong> {{topic.description}}
+            </ion-item>
+            <ion-item>
+                <strong>Expire Date: </strong>{{topic.destructDate | date: 'dd MMM y' || 'N/A'}}</br>
+            </ion-item>
+            <ion-item>
+                <strong>Responses:</strong>
+                <p ng-repeat="r in topic.responses">
+                    {{r.participant.uname}} (+{{r.shareDegree }}) : {{r.text || 'pending...'}}
+                </p>
             </ion-item>
         <ion-list>
     </ion-content>

@@ -1,7 +1,7 @@
 <ul class="list">
     <li class="item item-checkbox" ng-repeat="contact in contacts">
         <label class="checkbox">
-            <input type="checkbox" ng-model="contact.checked"/>
+            <input type="checkbox" ng-model="contact.checked" ng-disabled="contact.alreadyAdded"/>
         </label>
         <strong>{{contact.uname}}</strong>
     </li>

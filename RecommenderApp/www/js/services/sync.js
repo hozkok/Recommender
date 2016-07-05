@@ -6,6 +6,14 @@ angular.module('recommender.services')
                                                   httpRes.data));
     }
 
+    function syncTopic(topicId) {
+        var topicStorage = utils.instance({name: '/topics'});
+        return req.get('/topics/' + topicId)
+            .then(httpRes => {
+                return topicStorage.setItem(topicId, httpRes.data);
+            });
+    }
+
     function syncTopics() {
         var topicStorage = utils.instance({name: '/topics'});
         return req.get('/topics')
@@ -30,5 +38,6 @@ angular.module('recommender.services')
         syncPlaces,
         syncTopics,
         syncResponses,
+        syncTopic,
     };
 });

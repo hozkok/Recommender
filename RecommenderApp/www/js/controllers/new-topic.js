@@ -1,5 +1,16 @@
 angular.module('recommender.controllers')
-.controller('newTopicCtrl', function ($scope, $ionicHistory, $q, req, utils, $localForage, ionicDatePicker, info, $ionicPopup) {
+.controller('newTopicCtrl', function (
+        $scope,
+        $ionicHistory,
+        $q,
+        req,
+        utils,
+        $localForage,
+        ionicDatePicker,
+        info,
+        $ionicPopup,
+        selectParticipants) {
+
     $scope.topic = {};
     $scope.topicNotValid = true;
 
@@ -70,7 +81,7 @@ angular.module('recommender.controllers')
         })
         .then(result => {
             console.log('new-topic result:', result);
-            var savedTopic = result.data.savedTopic;
+            var savedTopic = result.data;
             return utils.instance('/topics')
                 .setItem(savedTopic._id, savedTopic);
         })
@@ -80,38 +91,13 @@ angular.module('recommender.controllers')
     }
 
     $scope.topic.participants = [];
-    function addParticipants() {
-        $localForage.getItem('user/contacts')
-            .then(contacts => {
-                console.log(contacts);
-                var scope = $scope.$new();
-                contacts.forEach(contact => {
-                    contact.checked = $scope.topic.participants.find(
-                        c => c._id === contact._id
-                    ) !== undefined;
-                });
-                scope.contacts = contacts;
-                $ionicPopup.show({
-                    title: 'Add Participants',
-                    templateUrl: 'templates/select-participants.html',
-                    scope,
-                    buttons: [
-                        {
-                            text: 'Ok',
-                            type: 'button-positive',
-                            onTap: event => {
-                                scope.topic.participants = scope.contacts
-                                    .filter(c => c.checked);
-                                console.log('selected participants:',
-                                            scope.topic.participants);
-                                checkTopicData(scope.topic);
-                            }
-                        },
-                    ]
-                });
-            });
-    }
-    $scope.addParticipants = addParticipants;
+
+    $scope.addParticipants = selectParticipants
+        .bind(undefined, $scope.$new(), {
+            onTap: event => {
+                checkTopicData($scope.topic);
+            }
+        });
 
     $scope.sendTopic = sendTopic;
 });
