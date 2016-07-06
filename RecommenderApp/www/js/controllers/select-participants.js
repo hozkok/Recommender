@@ -1,20 +1,30 @@
 angular.module('recommender.controllers')
-.factory('selectParticipants', function ($localForage, $ionicPopup) {
+.factory('selectParticipants', function ($localForage, $ionicPopup, share) {
     return function addParticipants(scope, opts) {
         $localForage.getItem('user/contacts')
             .then(contacts => {
                 console.log(contacts);
-                contacts.forEach(contact => {
-                    contact.checked = scope.topic.participants.find(
-                        c => c._id === contact._id
-                    ) !== undefined;
+                scope.contacts = contacts.map(contact => {
+                    var c = Object.assign({}, contact);
                     if (opts.excludes &&
                         opts.excludes.find(exclude => contact._id === exclude)) {
                         contact.alreadyAdded = true;
                         contact.checked = true;
+                        c.alreadyAdded = true;
+                        c.checked = true;
                     }
+                    if (opts.preSelect &&
+                        opts.preSelect.find(_c => _c._id === contact._id)) {
+                        c.checked = true;
+                    }
+                    return c;
                 });
-                scope.contacts = contacts;
+                scope.share = () => {
+                    share({
+                        message: 'Recommender is a great app.',
+                        link: 'web.recommender.com'
+                    });
+                };
                 $ionicPopup.show({
                     title: 'Add Participants',
                     templateUrl: 'templates/select-participants.html',
@@ -24,12 +34,13 @@ angular.module('recommender.controllers')
                             text: 'Ok',
                             type: 'button-positive',
                             onTap: event => {
-                                scope.topic.participants = scope.contacts
+                                var selectedParticipants = scope.contacts
                                     .filter(c => c.checked && !c.alreadyAdded);
+
                                 console.log('selected participants:',
-                                            scope.topic.participants);
+                                            selectedParticipants);
                                 if (opts.onTap) {
-                                    opts.onTap(event);
+                                    opts.onTap(event, selectedParticipants);
                                 }
                             }
                         },

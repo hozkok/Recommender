@@ -14,12 +14,12 @@ angular.module('recommender.controllers')
             excludes: $scope.topic.responses
                 .map(response => response.participant._id),
 
-            onTap: event => {
+            onTap: (event, selectedParticipants) => {
                     var participants = $scope.topic.participants;
-                    if (!participants.length) {
+                    if (selectedParticipants.length === 0) {
                         return;
                     }
-                    var responses = participants.map(p => {
+                    var responses = selectedParticipants.map(p => {
                         return {
                             parentTopic: $scope.topic,
                             participant: p,
@@ -27,11 +27,20 @@ angular.module('recommender.controllers')
                             shareDegree: 0
                         };
                     });
-                    $q.all(responses.map(newResponse =>
+                    var promise = $q.all(responses.map(newResponse =>
                         req.post('/responses', newResponse)
-                    ))
-                    .then(results => {
-                        info.show('participants added');
+                    )).then(results => {
+                        console.log(results);
+                        return req.get('/topics/' + $scope.topic._id)
+                            .then(httpRes => {
+                                $scope.topic = httpRes.data;
+                                return topicStore.setItem($scope.topic._id,
+                                                          httpRes.data);
+                            });
+                    });
+                    info.loading(promise, {
+                        successMessage: 'participants added.',
+                        errorMessage: undefined,
                     });
                 }
         });

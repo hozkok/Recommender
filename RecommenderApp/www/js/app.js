@@ -13,6 +13,8 @@ angular.module('recommender', [
     'recommender.controllers',
     'recommender.routes',
     'recommender.config',
+    'recommender.config',
+    'ion-accordion',
 ])
 
 .run(function ($ionicPlatform, $state, mainService, dataService, sync, info) {

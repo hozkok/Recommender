@@ -6,6 +6,9 @@ angular.module('recommender.services')
             return $q.resolve([
                 '0891231231',
                 '0892342342',
+                '0893453453',
+                '0894564564',
+                '0895675675',
             ]);
         }
         return $cordovaContacts.find({filter:'', multiple: true})

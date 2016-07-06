@@ -10,7 +10,7 @@ angular.module('recommender.controllers')
         })
         .then(userData => {
             dataService.set('user', userData);
-            $state.go('topics');
+            $state.go('tab.topics');
         });
     };
 });

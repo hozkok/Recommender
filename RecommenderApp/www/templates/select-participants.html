@@ -1,4 +1,14 @@
 <ul class="list">
+    <div
+        ng-if="contacts.length === 0"
+        style="text-align: center; margin: auto;">
+        No contact found.<br>
+        <button
+            ng-click="share()"
+            class="button button-calm icon-left ion-android-share-alt">
+            Share
+        </button>
+    </div>
     <li class="item item-checkbox" ng-repeat="contact in contacts">
         <label class="checkbox">
             <input type="checkbox" ng-model="contact.checked" ng-disabled="contact.alreadyAdded"/>

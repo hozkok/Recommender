@@ -17,9 +17,22 @@ angular.module('recommender.services')
                 url: path,
                 method: 'POST',
                 headers: prepHeader(),
-                data: Object.assign({},
-                                    {user: dataService.get('user')},
-                                    data)
+                data,
+            };
+        return $http(httpProps).catch(err => {
+            console.error(err);
+            return $q.reject(err);
+        });
+    }
+
+    function put(path, data, opts) {
+        path = utils.joinPaths([baseUrl, path]);
+        console.log(path, 'PUT');
+        var httpProps = {
+                url: path,
+                method: 'PUT',
+                headers: prepHeader(),
+                data,
             };
         return $http(httpProps).catch(err => {
             console.error(err);
@@ -33,6 +46,8 @@ angular.module('recommender.services')
         },
 
         post,
+
+        put,
 
         get(path) {
             path = utils.joinPaths([baseUrl, path]);

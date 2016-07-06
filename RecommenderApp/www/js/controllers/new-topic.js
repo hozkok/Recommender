@@ -92,12 +92,17 @@ angular.module('recommender.controllers')
 
     $scope.topic.participants = [];
 
-    $scope.addParticipants = selectParticipants
-        .bind(undefined, $scope.$new(), {
-            onTap: event => {
+    $scope.addParticipants = () => {
+        console.log($scope.topic.participants);
+        selectParticipants($scope.$new(), {
+            preSelect: $scope.topic.participants,
+            onTap: (event, selectedParticipants) => {
+                console.log('SELECTED:', selectedParticipants);
+                $scope.topic.participants = selectedParticipants;
                 checkTopicData($scope.topic);
             }
         });
+    };
 
     $scope.sendTopic = sendTopic;
 });
