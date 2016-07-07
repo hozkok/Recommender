@@ -41,13 +41,36 @@ router.post('/login',
         .catch(err => res.status(500).send(err));
 });
 
-router.put('/update-push-token',
+router.post('/update-push-token',
            populateUser,
            validators.checkMissings(['pushToken']),
            (req, res, next) => {
     req.user.pushToken = req.body.pushToken;
     req.user.save()
         .then(result => res.status(200).send(result))
+        .catch(err => res.status(500).send(err));
+});
+
+router.post('/contacts',
+            populateUser,
+            validators.checkMissings(['phoneNums']),
+            (req, res) => {
+    User.find({phoneNum: {$in: req.body.phoneNums}})
+        .then(results => {
+            req.user.contacts = results;
+            return req.user.save();
+        })
+        .then(result => res.status(200).send(result))
+        .catch(err => res.status(500).send(err));
+});
+
+router.get('/contacts',
+           populateUser,
+           (req, res) => {
+    req.user.populate('contacts').execPopulate()
+        .then(user => req.user.contacts.length !== 0
+            ? res.status(200).send(user.contacts)
+            : res.sendStatus(404))
         .catch(err => res.status(500).send(err));
 });
 

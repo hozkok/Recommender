@@ -22,6 +22,28 @@ router.post('/',
         .catch(err => res.status(500).send(err));
 });
 
+router.get('/',
+           populateUser,
+           (req, res, next) => {
+    Conversation.find({participant: req.user})
+        .populate({
+            path: 'addedBy',
+            model: 'User'
+        })
+        .populate({
+            path: 'parentTopic',
+            model: 'Topic'
+        })
+        .populate({
+            path: 'messages.sender',
+            model: 'User'
+        })
+        .then(results => results
+            ? res.status(200).send(results)
+            : res.sendStatus(404))
+        .catch(err => res.status(500).send(err));
+});
+
 router.param('conversationId', (req, res, next, id) => {
     Conversation.findById(id)
         .then(result => {

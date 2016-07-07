@@ -1,11 +1,12 @@
 const User = require('../models/user');
 
 module.exports = (req, res, next) => {
-    if (!req.body.user) {
-        return res.status(400).send('user field empty');
+    let userId = req.get('x-recommender-user');
+    if (!userId) {
+        return res.status(400).send('user header empty');
     }
 
-    User.findById(req.body.user._id)
+    User.findById(userId)
         .then(user => {
             if (!user) {
                 return Promise.reject('user not found.');

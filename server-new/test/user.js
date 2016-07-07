@@ -104,9 +104,9 @@ describe('/user', () => {
         });
     });
 
-    describe('/user/update-push-token', () => {
+    describe('/update-push-token', () => {
         it('should update push token.', done => {
-            request.put('/user/update-push-token')
+            request.post('/user/update-push-token')
                 .send({
                     user: {_id: registeredUserId},
                     pushToken: 'samplePushToken'
@@ -162,13 +162,6 @@ describe('/topics', () => {
                 });
         });
     });
-
-    describe('/conversations [POST]', () => {
-        it('should create a new conversation with user[s].');
-        describe('/:conversationId/messages [POST]', () => {
-            it('should post a new message.');
-        });
-    });
 });
 
 describe('/conversations', () => {
@@ -177,6 +170,7 @@ describe('/conversations', () => {
         participant: testData.users[2],
         addedBy: testData.users[0],
     };
+
     describe('/ [POST]', () => {
         it('should create a new conversation.', done => {
             testConversation.parentTopic = savedTopic;
@@ -213,5 +207,20 @@ describe('/conversations', () => {
                     done(err);
                 });
         });
+    });
+
+    describe('/ [GET]', () => {
+        it(`should get all the conversations,
+        which the user is a participant.`,
+            done => {
+                request.get('/conversations/')
+                    .send({
+                        user: testData.users[2]
+                    })
+                    .expect(200)
+                    .end((err, res) => {
+                        done(err);
+                    });
+            });
     });
 });

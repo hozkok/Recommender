@@ -15,7 +15,7 @@ switch (process.env.NODE_ENV) {
 case 'test':
     const errorHandler = require('errorhandler');
     server.use(errorHandler());
-    //server.use(logger('dev'));
+    server.use(logger('dev'));
     break;
 case 'production':
     server.use(logger('combined', {
