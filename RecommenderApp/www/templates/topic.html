@@ -23,9 +23,15 @@
             <ion-item>
                 <strong>Responses:</strong>
                 <p ng-repeat="r in topic.responses">
-                    {{r.participant.uname}} (+{{r.shareDegree }}) : {{r.text || 'pending...'}}
+                    {{r.participant.uname}} (+{{r.shareDegree }}) :
+                    {{r.text || (r.isCancelled ? 'cancelled.' : 'pending...')}}
                 </p>
             </ion-item>
         <ion-list>
+        <button
+            class="button button-full button-assertive"
+            ng-click="deleteTopic()">
+            Delete Topic
+        </button>
     </ion-content>
 </ion-view>

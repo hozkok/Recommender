@@ -26,7 +26,7 @@ angular.module('recommender.controllers')
                     });
                 };
                 $ionicPopup.show({
-                    title: 'Add Participants',
+                    title: '<strong>Add Participants</strong>',
                     templateUrl: 'templates/select-participants.html',
                     scope,
                     buttons: [
@@ -43,6 +43,16 @@ angular.module('recommender.controllers')
                                     opts.onTap(event, selectedParticipants);
                                 }
                             }
+                        },
+                        {
+                            text: 'Cancel',
+                            type: 'button-stable',
+                            onTap: event => {
+                                var selectedParticipants = [];
+                                if (opts.onTap) {
+                                    opts.onTap(event, selectedParticipants);
+                                }
+                            },
                         },
                     ]
                 });

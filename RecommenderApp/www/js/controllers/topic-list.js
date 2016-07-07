@@ -1,24 +1,50 @@
 angular.module('recommender.controllers')
-.controller('topicListCtrl', function ($scope, $state, $localForage, utils, sync) {
+.controller('topicListCtrl', function (
+        $scope,
+        $q,
+        $state,
+        $localForage,
+        utils,
+        sync) {
     console.log('inside topic list');
     $scope.topics = [];
     var topicsStorage = utils.instance({name:'/topics'});
-    function loadTopics() {
-        var topics = [];
-        topicsStorage.iterate((val, key) => {
-            console.log('topic:', {key, val});
-            topics.push(val);
-        })
-        .then(() => {
-            $scope.topics = topics;
-        });
+
+    function expiryFn(compareDate) {
+        compareDate = compareDate | new Date();
+        return topic => {
+            if (!topic.destructDate) {
+                return true;
+            }
+            return compareDate < new Date(topic.destructDate);
+        };
     }
+
+    function loadTopics() {
+        utils.loadItems(topicsStorage, {filter: expiryFn()})
+            .then(topics => {
+                $scope.topics = topics;
+            });
+    }
+
     $scope.syncTopics = (() => {
-        sync.syncTopics().then(results => {
+        // sync.syncTopics().then(results => {
+        //     $scope.$broadcast('scroll.refreshComplete');
+        //     loadTopics(); 
+        // });
+
+        $q.all($scope.topics.map(topic =>
+            sync.syncTopic(topic)
+                .then(syncedTopic => {
+                    Object.assign(topic, syncedTopic);
+                    return syncedTopic;
+                })
+        )).then(results => {
+            console.log('syncTopics results:', results);
             $scope.$broadcast('scroll.refreshComplete');
-            loadTopics(); 
         });
     });
+
     loadTopics();
 
     function deleteTopic(topic) {

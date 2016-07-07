@@ -6,13 +6,30 @@ angular.module('recommender.controllers')
         info,
         dataService,
         $q,
-        selectParticipants) {
+        selectParticipants,
+        $ionicPopup) {
     console.log('inside responsesCtrl');
     var responseStorage = utils.instance({name: '/responses'});
     $scope.responses = [];
     responseStorage.iterate((val, key) => {
         $scope.responses.push(val);
     });
+
+    function expiryFn(compareDate) {
+        compareDate = compareDate | new Date();
+        return response => {
+            var expiryDate = response.parentTopic.destructDate;
+            if (!expiryDate) {
+                return true;
+            }
+            return compareDate < new Date(expiryDate);
+        };
+    }
+
+    utils.loadItems(responseStorage, {filter: expiryFn()})
+        .then(responses => {
+            $scope.responses = responses;
+        });
 
     $scope.refresh = () => {
         req.get('/responses')
@@ -39,13 +56,21 @@ angular.module('recommender.controllers')
             });
     };
 
+    $scope.$on('responsedata', (event, newResponseData) => {
+        var matchResponse = $scope.responses.find(response =>
+            response._id === newResponseData._id
+        );
+        if (matchResponse) {
+            Object.assign(matchResponse, newResponseData);
+        }
+    });
+
     function putResponse(response) {
         return req.put(('/responses/' + response._id), response)
             .then(httpRes => {
                 var updatedResponse = httpRes.data;
                 response.isFulfilled = true;
-                return responseStorage.setItem(response._id,
-                                               response);
+                return responseStorage.setItem(response._id, response);
             });
     }
 
@@ -58,19 +83,55 @@ angular.module('recommender.controllers')
     }
 
     $scope.updateResponseText = (response) => {
-        info.loading(putResponse(response), {
-            successMessage: 'response sent!',
-            errorMessage: undefined
+        $ionicPopup.prompt({
+            title: 'Respond with a message.'
+        }).then(val => {
+            if (!val) {
+                return;
+            }
+            response.text = val;
+            info.loading(putResponse(response), {
+                successMessage: 'response sent!',
+                errorMessage: undefined
+            });
+        });
+    };
+
+    $scope.deleteResponse = (response) => {
+        $ionicPopup.confirm({
+            title: 'Are you sure to delete this request?',
+        }).then(confirmed => {
+            if (!confirmed) {
+                return;
+            }
+            return info.loading(
+                req.delete('/responses/' + response._id)
+                    .catch(err => {
+                        if (err.status === 404) {
+                            return err;
+                        }
+                        $q.reject(err);
+                    })
+                    .then(httpRes => {
+                        return responseStorage.removeItem(response._id);
+                    })
+                    .then(result => {
+                        utils.removeOne($scope.responses,
+                                        (r => r._id === response._id));
+                    }),
+                {
+                    successMessage: 'Response request is deleted.',
+                    errorMessage: undefined,
+                }
+            );
         });
     };
 
     $scope.forwardResponse = (response) => {
         console.log($scope.responses);
         selectParticipants($scope.$new(), {
-            excludes: $scope.responses.reduce((acc, response) => {
-                return acc.concat(response.parentTopic.responses
-                    .map(r => r.participant));
-            }, []),
+            excludes: response.parentTopic.responses.map(r => r.participant),
+
             onTap: (event, selectedParticipants) => {
                 if (selectedParticipants.length === 0) {
                     return;

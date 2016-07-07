@@ -1,15 +1,17 @@
 angular.module('recommender.controllers')
-.controller('loginCtrl', function ($scope, login, info, $localForage, $state, dataService) {
+.controller('loginCtrl', function ($scope, login, info, $localForage, $state, dataService, sync) {
     $scope.credentials = {};
     $scope.login = () => {
-        loginAndSavePromise = login($scope.credentials)
-            .then(user => $localForage.setItem('user', user));
-        info.loading(loginAndSavePromise, {
+        var loginAndSyncPromise = login($scope.credentials)
+            .then(user => $localForage.setItem('user', user))
+            .then(userData => {
+                dataService.set('user', userData);
+                return sync.all();
+            });
+        info.loading(loginAndSyncPromise, {
             successMessage: 'login success.',
             errorMessage: 'could not login.'
-        })
-        .then(userData => {
-            dataService.set('user', userData);
+        }).then(() => {
             $state.go('tab.topics');
         });
     };

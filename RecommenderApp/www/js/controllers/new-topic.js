@@ -76,7 +76,7 @@ angular.module('recommender.controllers')
             postTopic,
         ]);
         return info.loading(asyncTasks, {
-                successMessage: 'topic is sent.',
+                successMessage: 'topic is created.',
                 errorMessage: undefined,
         })
         .then(result => {

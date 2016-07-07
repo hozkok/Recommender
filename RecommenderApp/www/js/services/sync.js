@@ -7,6 +7,7 @@ angular.module('recommender.services')
     }
 
     function syncTopic(topicId) {
+        topicId = (typeof topicId === 'string') ? topicId : topicId._id;
         var topicStorage = utils.instance({name: '/topics'});
         return req.get('/topics/' + topicId)
             .then(httpRes => {
@@ -25,19 +26,36 @@ angular.module('recommender.services')
         var responseStorage = utils.instance({name: '/responses'});
         return req.get('/responses')
             .then(httpRes => $q.all(httpRes.data
-                .map(response => topicStorage.setItem(response._id, response))));
+                .map(response => responseStorage.setItem(response._id, response)))
+            )
+            .catch(err => {
+                if (err.status === 404) {
+                    return $q.resolve();
+                }
+                return $q.reject(err);
+            });
     }
+
     return {
         all() {
             return $q.all([
                 contacts.refreshContacts(),
                 syncPlaces(),
                 syncTopics(),
-            ]);
+                syncResponses(),
+            ].map(promise => promise.catch(err => {
+                console.error(err);
+            })));
         },
         syncPlaces,
         syncTopics,
         syncResponses,
         syncTopic,
+        clear() {
+            return $q.all([
+                utils.instance({name: '/topics'}).clear(),
+                utils.instance({name: '/responses'}).clear(),
+            ]);
+        },
     };
 });

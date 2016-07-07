@@ -1,5 +1,5 @@
 angular.module('recommender.controllers')
-.controller('topicCtrl', function ($scope, $stateParams, utils, selectParticipants, req, dataService, info, $q, sync) {
+.controller('topicCtrl', function ($scope, $stateParams, utils, selectParticipants, req, dataService, info, $q, sync, $ionicPopup, $ionicHistory) {
     var topicId = $stateParams.id;
     var topicStore = utils.instance({name: '/topics'});
     topicStore.getItem(topicId)
@@ -8,6 +8,12 @@ angular.module('recommender.controllers')
             $scope.topic = topic;
             $scope.topic.participants = [];
         });
+
+    $scope.$on('topicdata', (event, newTopicData) => {
+        if (newTopicData._id === topicId) {
+            $scope.topic = topic;
+        }
+    });
 
     $scope.addParticipants = () => {
         selectParticipants($scope.$new(), {
@@ -43,6 +49,29 @@ angular.module('recommender.controllers')
                         errorMessage: undefined,
                     });
                 }
+        });
+    };
+
+    $scope.deleteTopic = () => {
+        $ionicPopup.confirm({
+            title: 'Are you sure to delete topic?'
+        }).then(confirmed => {
+            if (!confirmed) {
+                return;
+            }
+            return info.loading(
+                req.delete('/topics/' + topicId)
+                    .then(httpRes => {
+                        return topicStore.removeItem(topicId);
+                    })
+                    .then(result => {
+                        $ionicHistory.goBack();
+                    }),
+                {
+                    successMessage: 'Topic has been deleted.',
+                    errorMessage: undefined,
+                }
+            );
         });
     };
 

@@ -3,7 +3,7 @@ angular.module('recommender.services')
     return function (shareObj) {
         if (!window.cordova) {
             return $ionicPopup.alert({
-                template: 'Not available on browser.'
+                title: 'Not available on browser.'
             });
         }
         return $cordovaSocialSharing.share(

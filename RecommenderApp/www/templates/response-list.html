@@ -18,17 +18,20 @@
                 title-text="Added by: {{r.addedBy.uname}} -
                             {{idToDate(r._id) | date: 'dd MMM y'}}">
                 <div>
-                    <strong>What:</strong>{{r.parentTopic.what}}</br>
-                    <strong>Where:</strong>{{r.parentTopic.where}}<br>
-                    <strong>Description:</strong>{{r.parentTopic.description}}<br>
+                    <strong>What: </strong>{{r.parentTopic.what}}</br>
+                    <strong>Where: </strong>{{r.parentTopic.where}}<br>
+                    <strong>Description: </strong>{{r.parentTopic.description}}<br>
                 </div>
                 <button
                     class="button button-icon icon ion-compose"
-                    ng-click="forwardResponse(r)"
+                    ng-click="updateResponseText(r)"
                     ng-disabled="r.isFulfilled">
                 </button>
                 <button class="button button-icon icon ion-forward"
                         ng-click="forwardResponse(r)">
+                </button>
+                <button class="button button-icon icon ion-trash-a"
+                        ng-click="deleteResponse(r)">
                 </button>
             </accordion-item>
         </ion-accordion>

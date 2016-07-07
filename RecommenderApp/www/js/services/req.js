@@ -40,27 +40,44 @@ angular.module('recommender.services')
         });
     }
 
+    function get(path) {
+        path = utils.joinPaths([baseUrl, path]);
+        console.log(path, 'GET');
+        var httpProps = {
+                url: path,
+                method: 'GET',
+                headers: prepHeader(),
+            };
+        return $http(httpProps).catch(err => {
+            console.error(err);
+            return $q.reject(err);
+        });
+    }
+
+    function del(path) {
+        path = utils.joinPaths([baseUrl, path]);
+        var httpProps = {
+                url: path,
+                method: 'DELETE',
+                headers: prepHeader(),
+            };
+        return $http(httpProps).catch(err => {
+            console.error(err);
+            return $q.reject(err);
+        });
+    }
+
     return {
-        init: function () {
+        init() {
             return;
         },
+
+        get: get,
 
         post,
 
         put,
 
-        get(path) {
-            path = utils.joinPaths([baseUrl, path]);
-            console.log(path, 'GET');
-            var httpProps = {
-                    url: path,
-                    method: 'GET',
-                    headers: prepHeader(),
-                };
-            return $http(httpProps).catch(err => {
-                console.error(err);
-                return $q.reject(err);
-            });
-        },
+        delete: del,
     };
 });
