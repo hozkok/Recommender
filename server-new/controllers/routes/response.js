@@ -13,10 +13,13 @@ router.post('/',
                 'participant', 'parentTopic', 'shareDegree'
             ]),
             (req, res, next) => {
-    return Topic.findById(req.body.parentTopic)
+    req.passedData.promise = Topic.findById(req.body.parentTopic)
         .then(topic => {
             if (!topic) {
-                return res.status(404).send('topic not found.');
+                return Promise.reject({
+                    status: 404,
+                    message: 'parentTopic not found.'
+                });
             }
             const response = new Response({
                 participant: req.body.participant,
@@ -24,117 +27,139 @@ router.post('/',
                 parentTopic: req.body.parentTopic,
                 shareDegree: req.body.shareDegree,
             });
-            return response.save().then(result => [topic, result]);
+            return Promise.all([topic, response.save()]);
         })
         .then(([topic, response]) => {
             topic.responses.push(response);
             return topic.save().then(result => response);
-        })
-        .then(response => res.status(200).send(response))
-        .catch(err => res.status(500).send(err));
+        });
+    next();
 });
 
 router.put('/:responseId',
            validators.checkMissings(['text']),
-           (req, res) => {
-    Response.findById(req.params.responseId)
-        .then(responseObj => {
-            if (!responseObj) {
-                return res.sendStatus(404);
+           (req, res, next) => {
+    let responseId = req.params.responseId;
+    req.passedData.promise = Response.findById(responseId)
+        .then(response => {
+            if (!response) {
+                return Promise.reject({
+                    status: 404,
+                    message: 'Not found.'
+                });
             }
-            responseObj.text = req.body.text;
-            responseObj.isFulfilled = true;
-            return responseObj.save().then(result => {
-                res.status(200).send(result);
-            });
-        })
-        .catch(err => res.status(500).send(err));
+            response.text = req.body.text;
+            response.isFulfilled = true;
+            return response.save();
+        });
+    next();
 });
 
 router.get('/:responseId',
-           (req, res) => {
-    Response.findById(req.param.responseId)
-        .populate({
-            path: 'parentTopic',
-            model: 'Topic',
-            populate: {
-                path: 'responses',
-                model: 'Response',
-            }
-        })
-        .populate({
-            path: 'addedBy',
-            model: 'User',
-        })
-        .then(response => {
-            if (!response) {
-                return res.sendStatus(404);
-            }
-            res.status(200).send(response);
-        })
-        .catch(err => res.status(500).send(err));
-});
-
-router.delete('/:responseId', (req, res) => {
+           (req, res, next) => {
     let responseId = req.params.responseId;
     Response.findById(responseId)
+        .populate({
+            path: 'addedBy',
+            model: 'User'
+        })
         .then(response => {
             if (!response) {
-                return res.sendStatus(404);
+                return Promise.reject({
+                    status: 404,
+                    message: 'Response not found.'
+                });
+            }
+            return Topic.findById(response.parentTopic)
+                .then(topic => {
+                    if (!topic) {
+                        return Promise.reject({
+                            status: 404,
+                            message: 'parentTopic not found.'
+                        });
+                    }
+                    response.parentTopic = topic;
+                    return response;
+                });
+        });
+    next();
+});
+
+router.delete('/:responseId', (req, res, next) => {
+    let responseId = req.params.responseId;
+    req.passedData.promise = Response.findById(responseId)
+        .then(response => {
+            if (!response) {
+                return Promise.reject({
+                    status: 404,
+                    message: 'Not found.'
+                });
             }
             response.isCancelled = true;
-            response.save().then(result => {
-                res.sendStatus(200);
-            });
-            //Promise.all([
-            //    //response.remove(),
-            //    Topic.findByIdAndUpdate(response.parentTopic,
-            //                            {$pull: {responses: responseId}})
-            //]).then(results => {
-            //    console.log(results);
-            //    res.sendStatus(200);
-            //});
-        })
-        .catch(err => res.status(500).send(err));
+            return response.save();
+        });
+    next();
 });
 
 router.get('/',
            populateUser,
            (req, res, next) => {
-    Response.find({participant: req.user, isDelivered: false})
-        .populate({
-            path: 'addedBy',
-            model: 'User'
-        })
-        .populate({
-            path: 'parentTopic',
-            model: 'Topic',
-            populate: {
-                path: 'creator',
-                model: 'User',
-            },
-            populate: {
-                path: 'responses',
-                model: 'Response',
-                select: 'participant',
-            },
-        })
-        .then(results => {
-            if (results.length === 0) {
-                return res.sendStatus(404);
-            }
-
-            res.status(200).send(results);
-
-            // after results are sent, update their isDelivered flag
-            Promise.all(results.map(result => {
-                result.isDelivered = true;
-                return result.save();
-            })).catch(err => {
-                console.error(err);
+    req.passedData.promise = Response.find({
+        participant: req.user,
+        isDelivered: false
+    }).then(responses => {
+        if (responses.length === 0) {
+            return Promise.reject({
+                status: 404,
+                message: 'Not found.'
             });
-        })
-        .catch(err => res.status(500).send(err));
+        }
+        Promise.all(responses.map(response => {
+            response.isDelivered = true;
+            return response.save();
+        })).catch(err => {
+            console.error('update isDelivered error:', err);
+        });
+
+        return Promise.all(responses.map(response => {
+            return Promise.all([
+                response.populate({
+                        path: 'addedBy',
+                        model: 'User',
+                    }).execPopulate(),
+                Topic.findById(response.parentTopic)
+                    .populate({
+                        path: 'creator',
+                        model: 'User'
+                    })
+                    .populate({
+                        path: 'responses',
+                        model: 'Response',
+                        select: 'participant'
+                    })
+            ]).then(([response, topic]) => {
+                if (!topic) {
+                    return;
+                }
+                return {
+                    _id: response._id,
+                    parentTopic: topic,
+                    shareDegree: response.shareDegree,
+                    participant: response.participant,
+                    addedBy: response.addedBy,
+                };
+            });
+        })).then(results => {
+            results = results.filter(r => r !== undefined);
+            return (results.length === 0)
+                ? Promise.reject({
+                    status: 404,
+                    message: 'No response with valid topic found.'
+                })
+                : results;
+        });
+    });
+    next();
 });
 
 module.exports = router;

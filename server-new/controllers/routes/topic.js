@@ -11,7 +11,7 @@ const router = require('express').Router({
 router.get('/',
            populateUser,
            (req, res, next) => {
-    Topic.find({creator: req.user._id})
+    req.passedData.promise = Topic.find({creator: req.user._id})
         .populate({
             path: 'creator',
             model: 'User',
@@ -21,16 +21,15 @@ router.get('/',
             model: 'Response',
             populate: {
                 path: 'participant',
-                model: 'User',
+                model: 'User'
             }
-        })
-        .then((result) => res.status(200).send(result))
-        .catch(err => res.status(500).send(err));
+        });
+    next();
 });
 
 router.get('/:topicId',
-           (req, res) => {
-    Topic.findById(req.params.topicId)
+           (req, res, next) => {
+    req.passedData.promise = Topic.findById(req.params.topicId)
         .populate({
             path: 'responses',
             model: 'Response',
@@ -38,11 +37,8 @@ router.get('/:topicId',
                 path: 'participant',
                 model: 'User',
             }
-        })
-        .then(result => {
-            res.status(200).send(result);
-        })
-        .catch(err => res.status(500).send(err));
+        });
+    next();
 });
 
 router.post('/',
@@ -53,55 +49,46 @@ router.post('/',
             ]),
             (req, res, next) => {
     const topic = new Topic({
-        creator: req.user._id,
+        creator: req.user,
         what: req.body.what,
         where: req.body.where,
         description: req.body.description,
         destructDate: req.body.destructDate,
     });
-    topic.save()
-        // topic is saved.
-        .then(savedTopic => {
-            const responseReqs = req.body.participants
-                .map(p => new Response({
-                    participant: p,
-                    addedBy: req.user,
-                    parentTopic: savedTopic,
-                }));
-            return Promise.all(responseReqs.map(r => r.save()))
-                .then(savedResponseReqs => {
-                    savedTopic.responses = savedResponseReqs;
-                    return savedTopic.save();
-                });
+    const responses = req.body.participants.map(p =>
+        new Response({
+            participant: p,
+            addedBy: req.user,
+            parentTopic: topic,
         })
-        // all topic response requests are created.
-        .then((savedTopic) => {
-            return savedTopic.populate({
-                path: 'responses',
-                model: 'Response',
-                populate: {
-                    path: 'participant',
-                    model: 'User',
-                }
-            }).execPopulate();
-        })
-        .then(savedTopic => res.status(200).send(savedTopic))
-        .catch(err => {
-            console.error(err);
-            res.status(500).send(err);
-        });
+    );
+    topic.responses = responses;
+    req.passedData.promise =
+        Promise.all([topic.save(), ...responses.map(r => r.save())])
+            .then(([topic, ...responses]) => {
+                return topic.populate({
+                    path: 'responses',
+                    model: 'Response',
+                    populate: {
+                        path: 'participant',
+                        model: 'User'
+                    }
+                }).execPopulate();
+            });
+    next();
 });
 
-router.delete('/:topicId', (req, res) => {
+router.delete('/:topicId', (req, res, next) => {
     var topicId = req.params.topicId;
-    Topic.findById(topicId)
-        .then(topic => {
-            if (!topic) {
-                return Promise.reject(res.sendStatus(404));
-            }
-            return topic.remove()
-                .then(result => res.status(200).send(result));
-        });
+    req.passedData.promise = Topic.findById(topicId)
+        .then(topic => topic
+            ? topic.remove()
+            : Promise.reject({
+                status: 404,
+                message: 'Not found.'
+            })
+        );
+    next();
 });
 
 module.exports = router;

@@ -9,6 +9,12 @@ const userRouter = require('./routes/user'),
       conversationRouter = require('./routes/conversation.js'),
       responseRouter = require('./routes/response.js');
 
+// populate request with initial passedData object.
+router.use((req, res, next) => {
+    req.passedData = {};
+    next();
+});
+
 router.use('/user', userRouter);
 router.use('/topics', topicRouter);
 router.use('/conversations', conversationRouter);
@@ -27,5 +33,7 @@ router.get('/where-list', (req, res) => {
         ]
     });
 });
+
+router.use(require('../utils/promise-to-req-handler.js'));
 
 module.exports = router;

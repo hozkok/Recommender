@@ -33,11 +33,14 @@ angular.module('recommender.controllers')
 
     $scope.refresh = () => {
         req.get('/responses')
-            .then(httpRes =>
-                $q.all(httpRes.data.map(responseObj =>
+            .then(httpRes => {
+                console.log(httpRes);
+                return $q.all(httpRes.data.map(responseObj =>
                     responseStorage.setItem(responseObj._id,
-                                            responseObj))))
+                        responseObj)));
+            })
             .then(results => {
+                console.log(results);
                 $scope.responses = $scope.responses.concat(results);
                 $scope.$broadcast('scroll.refreshComplete');
             })
@@ -128,7 +131,6 @@ angular.module('recommender.controllers')
     };
 
     $scope.forwardResponse = (response) => {
-        console.log($scope.responses);
         selectParticipants($scope.$new(), {
             excludes: response.parentTopic.responses.map(r => r.participant),
 
@@ -144,18 +146,20 @@ angular.module('recommender.controllers')
                     };
                 });
                 var promise = $q.all(newResponses.map(r =>
-                    req.post('/responses', r)
-                )).then(results => {
-                    results.forEach(result => {
-                        console.log('result:', result);
-                        response.parentTopic.responses.push(result.data);
+                        req.post('/responses', r)
+                    )).then(results => {
+                        results.forEach(result => {
+                            console.log('result:', result);
+                            response.parentTopic.responses.push(result.data);
+                        });
+                        return responseStorage.setItem(response._id, response);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        return $q.reject(err.status === 404
+                            ? 'Topic is not found.'
+                            : err);
                     });
-                    return responseStorage.setItem(response._id, response);
-                })
-                .catch(err => {
-                    console.error(err);
-                    return $q.reject(err);
-                });
                 info.loading(promise, {
                     successMessage: 'topic is successfully forwarded.',
                     errorMessage: undefined,

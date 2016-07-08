@@ -29,6 +29,7 @@ angular.module('recommender', [
         mainService.init()
             .then(results => {
                 console.log(`mainService init results:`, results);
+                //sync.clear();
                 if (dataService.get('user')) {
                     sync.all();
                     $state.go('tab.topics');
