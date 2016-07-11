@@ -17,7 +17,8 @@ angular.module('recommender.services')
                 .filter(contact => contact.phoneNumbers)
                 .map(contact => contact.phoneNumbers)
                 .reduce((allNums, nums) => allNums.concat(
-                    nums.map(num => num.value.replace(/ /g, ''))), []));
+                    nums.filter(num => num.value)
+                        .map(num => num.value.replace(/ /g, ''))), []));
     }
 
     function postPhoneNums(phoneNums) {
@@ -31,7 +32,10 @@ angular.module('recommender.services')
             .then(httpRes => {
                 console.log('user/contacts [GET]', httpRes.data);
                 return $localForage.setItem('user/contacts', httpRes.data);
-            });
+            })
+            .catch(err => (err.status === 404)
+                ? $localForage.setItem('user/contacts', [])
+                : $q.reject(err));
     }
 
     function refreshContacts() {

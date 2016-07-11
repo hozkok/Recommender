@@ -21,7 +21,15 @@ angular.module('recommender.services')
             };
         return $http(httpProps).catch(err => {
             console.error(err);
-            return $q.reject(err);
+            if (err.data && (typeof err.data === 'string')) {
+                return $q.reject(err.data);
+            }
+            switch (err.status) {
+            case 400:
+                return $q.reject(err.data.map(e => e.msg).join('\n'));
+            default:
+                return $q.reject(err);
+            }
         });
     }
 

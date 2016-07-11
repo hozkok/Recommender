@@ -38,14 +38,23 @@ angular.module('recommender.services')
 
     return {
         all() {
-            return $q.all([
+            var promises = [
                 contacts.refreshContacts(),
                 syncPlaces(),
-                syncTopics(),
+                //syncTopics(),
                 syncResponses(),
-            ].map(promise => promise.catch(err => {
-                console.error(err);
-            })));
+                //$localForage.removeItem('user')
+            ];
+            promises.forEach(p => {
+                p.then(result => {
+                    console.log('sync result:', result);
+                    return result;
+                }).catch(err => {
+                    console.error('sync err:', err);
+                    return err;
+                });
+            });
+            return $q.all(promises);
         },
         syncPlaces,
         syncTopics,

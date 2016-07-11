@@ -9,12 +9,18 @@ angular.module('recommender.routes', [])
             .state('tab', {
                 url: '/tab',
                 templateUrl: 'templates/tab-container.html',
-                controller: function ($scope, share) {
+                controller: function ($scope, share, sync, info) {
                     $scope.share = share.bind(undefined, {
                         message: 'Recommender is a great app. want to try out?',
                         subject: 'Recommender App',
                         link: 'web.recommender.com',
                     });
+                    $scope.sync = () => {
+                        info.loading(sync.all(), {
+                            successMessage: 'sync is done.',
+                            errorMessage: undefined,
+                        });
+                    };
                 },
                 abstract: true,
             })

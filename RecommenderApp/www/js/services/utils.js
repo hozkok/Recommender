@@ -42,7 +42,7 @@ angular.module('recommender.services')
                         items.push(val);
                     };
                 }
-            }());
+            })();
             return db.iterate(iterFn).then(() => items);
         },
 
