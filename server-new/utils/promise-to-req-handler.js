@@ -20,7 +20,9 @@ const promiseToReqResHandler = (req, res) => {
                 switch (err.status) {
                 case 400:
                 case 404:
-                    res.status(err.status).send(err.message ? err.message : err);
+                    res.status(err.status).send(err.message
+                        ? err.message
+                        : err);
                     break;
                 default:
                     res.status(500).send(err);

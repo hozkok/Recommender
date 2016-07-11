@@ -33,6 +33,8 @@ server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
 server.use(expressValidator());
 
+server.use(require('./utils/allow-cors.js'));
+
 server.use('/', require('./controllers'));
 
 module.exports = mongoose.connect(process.env.MONGO_PATH)
