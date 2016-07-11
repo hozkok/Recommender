@@ -11,6 +11,9 @@ dotenv.config({path: '.env-variables'});
 
 const server = express();
 
+// allow cross domain requests.
+server.use(require('./utils/allow-cors.js'));
+
 switch (process.env.NODE_ENV) {
 case 'test':
     const errorHandler = require('errorhandler');
@@ -32,8 +35,6 @@ server.use(compress());
 server.use(bodyParser.urlencoded({extended: false}));
 server.use(bodyParser.json());
 server.use(expressValidator());
-
-server.use(require('./utils/allow-cors.js'));
 
 server.use('/', require('./controllers'));
 
