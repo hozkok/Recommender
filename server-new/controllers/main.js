@@ -20,8 +20,8 @@ router.use('/topics', topicRouter);
 router.use('/conversations', conversationRouter);
 router.use('/responses', responseRouter);
 
-router.get('/where-list', (req, res) => {
-    res.status(200).send({
+router.get('/where-list', (req, res, next) => {
+    req.passedData.promise = Promise.resolve({
         label: "locations",
         counties: [
             "Cork", "Galway", "Mayo", "Donegal", "Kerry", "Tipperary",
@@ -32,6 +32,7 @@ router.get('/where-list', (req, res) => {
             "Longford", "Dublin", "Carlow", "Louth"
         ]
     });
+    next();
 });
 
 router.use(require('../utils/promise-to-req-handler.js'));
