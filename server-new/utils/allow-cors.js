@@ -4,7 +4,7 @@ function allowCORS(req, res, next) {
     res.header('Access-Control-Allow-Headers', 'Content-Type, x-recommender-user');
 
     if (req.method === 'OPTIONS') {
-        req.sendStatus(200);
+        res.sendStatus(200);
     } else {
         next();
     }
