@@ -54,12 +54,3 @@ angular.module('recommender', [
         description: 'recommender offline storage'
     });
 });
-
-//.config(function ($stateProvider) {
-//    $stateProvider
-//        .state('login', {
-//            url: '/login',
-//            templateUrl: 'templates/login.html',
-//            controller: 'loginCtrl'
-//        });
-//});

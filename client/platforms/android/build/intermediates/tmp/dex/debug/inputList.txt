@@ -1,8 +1,0 @@
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/classes/debug
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/support-annotations-22.1.1-3ef8e5cec00f154215a466e7885fa6972786abbb.jar
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/sqlite-connector-9fba91ba38b36eb15f8d5638c6beb181042df421.jar
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/gcm-366dc178bf15884b36dbabe120499d10ae35d23f.jar
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/classes-59ccab1c624bbc031dfedfcd91d4c37866ef66b0.jar
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/internal_impl-22.1.1-67358e79efbe4072eb30fa22cdcecbb56993ac78.jar
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/classes-c9646e5c72cc30cce4a8baead6b02c369b858ac6.jar
-/home/zeawee/csdev/Recommender/client/platforms/android/build/intermediates/pre-dexed/debug/sqlite-native-driver-757b946e2d2e74f513a742c79572c55f763efe5b.jar
