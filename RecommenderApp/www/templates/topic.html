@@ -22,10 +22,18 @@
             </ion-item>
             <ion-item>
                 <strong>Responses:</strong>
-                <p ng-repeat="r in topic.responses">
+                <div
+                    style="padding: 5px 0 5px 0; border-top: 1px outset;"
+                    ng-repeat="r in topic.responses">
                     {{r.participant.uname}} (+{{r.shareDegree }}) :
-                    {{r.text || (r.isCancelled ? 'cancelled.' : 'pending...')}}
-                </p>
+                    <p
+                        class="item-text-wrap"
+                        ng-bind-html="
+                        r.text ||
+                        (r.isCancelled ? 'cancelled.' : 'pending...')
+                        | tel">
+                    </p>
+                </div>
             </ion-item>
         <ion-list>
         <button

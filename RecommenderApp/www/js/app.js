@@ -13,11 +13,11 @@ angular.module('recommender', [
     'recommender.controllers',
     'recommender.routes',
     'recommender.config',
-    'recommender.config',
     'ion-accordion',
+    'filters'
 ])
 
-.run(function ($ionicPlatform, $state, mainService, dataService, sync, info) {
+.run(function ($ionicPlatform, $state, mainService, dataService, sync) {
     $ionicPlatform.ready(function () {
         if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);

@@ -10,6 +10,7 @@ angular.module('recommender.services')
                 '0894564564',
                 '0895675675',
                 '0891234567',
+                '0892311229'
             ]);
         }
         return $cordovaContacts.find({filter:'', multiple: true})
