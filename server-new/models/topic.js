@@ -28,6 +28,9 @@ const topicSchema = new Schema({
     responses: [ObjectId], //response id
 });
 
+topicSchema.post('save', topic => {
+});
+
 const Topic = mongoose.model('Topic', topicSchema);
 
 module.exports = Topic;

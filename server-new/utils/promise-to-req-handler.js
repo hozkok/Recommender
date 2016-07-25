@@ -1,6 +1,5 @@
 const promiseToReqResHandler = (req, res) => {
     if (!req.passedData.promise) {
-        console.error('no promise is passed.');
         return res.status(500).send('no promise is passed.');
     }
     req.passedData.promise

@@ -1,5 +1,5 @@
 angular.module('recommender.services')
-.factory('sync', function ($q, req, dataService, contacts, $localForage, utils) {
+.factory('sync', function ($q, req, dataService, contacts, $localForage, utils, pushNotification) {
     function syncPlaces() {
         return req.get('/where-list')
             .then(httpRes => $localForage.setItem('/where-list',
@@ -43,6 +43,7 @@ angular.module('recommender.services')
                 syncPlaces(),
                 //syncTopics(),
                 syncResponses(),
+                pushNotification.init()
                 //$localForage.removeItem('user')
             ];
             promises.forEach(p => {

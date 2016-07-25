@@ -9,8 +9,8 @@ angular.module('recommender.services', [])
     return {
         init() {
             return initAll([
-                dataService,
+                dataService
             ]);
-        },
+        }
     };
 });
