@@ -30,8 +30,9 @@ const topicSchema = new Schema({
     responses: [ObjectId] //response id
 });
 
-topicSchema.pre('save', () => {
+topicSchema.pre('save', (next) => {
     this.wasNew = this.isNew;
+    next();
 });
 
 topicSchema.post('save', () => {
