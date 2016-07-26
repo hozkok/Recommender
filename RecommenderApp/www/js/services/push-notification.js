@@ -1,5 +1,5 @@
 angular.module('recommender.services')
-.factory('pushNotification', function ($q, $cordovaPushV5, config) {
+.factory('pushNotification', function ($q, $cordovaPushV5, config, req) {
     var options = config.pushNotificationOptions;
     return {
         init() {
@@ -11,8 +11,12 @@ angular.module('recommender.services')
                         $cordovaPushV5.onError();
                         return $cordovaPushV5.register();
                     })
-                    .then(registerData => {
-                        console.log({registerData});
+                    .then(pushToken => {
+                        console.log('pushToken:', pushToken);
+                        return req.put('/update-push-token', {pushToken});
+                    })
+                    .catch(err => {
+                        console.error('$cordovaPushV5 err:', err);
                     })
                 : $q.resolve();
         }

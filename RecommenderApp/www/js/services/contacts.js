@@ -4,12 +4,12 @@ angular.module('recommender.services')
     function getPhoneNums() {
         if (!window.cordova) {
             return $q.resolve([
-                '0891231231',
-                '0892342342',
-                '0893453453',
-                '0894564564',
-                '0895675675',
-                '0891234567',
+                '0891231231', // TestUser1
+                '0892342342', // TestUser2
+                '0893453453', // TestUser3
+                '0894564564', // TestUser4
+                '0895675675', // TestUser5
+                '0891234567', // Browser
                 '0892311229'
             ]);
         }

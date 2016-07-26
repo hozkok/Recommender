@@ -41,15 +41,16 @@ router.post('/login',
         .catch(err => res.status(500).send(err));
 });
 
-router.post('/update-push-token',
+function putPushToken(req, res, next) {
+    req.user.pushToken = req.body.pushToken;
+    req.passedData.promise = req.user.save();
+    next();
+}
+
+router.put('/update-push-token',
            populateUser,
            validators.checkMissings(['pushToken']),
-           (req, res, next) => {
-    req.user.pushToken = req.body.pushToken;
-    req.user.save()
-        .then(result => res.status(200).send(result))
-        .catch(err => res.status(500).send(err));
-});
+           putPushToken);
 
 router.post('/contacts',
             populateUser,
