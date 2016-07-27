@@ -30,14 +30,13 @@ const topicSchema = new Schema({
     responses: [ObjectId] //response id
 });
 
-topicSchema.pre('save', (next) => {
-    this.wasNew = this.isNew;
+topicSchema.pre('save', function (next) {
+    this._wasNew = this.isNew;
     next();
 });
 
-topicSchema.post('save', () => {
-    let topic = this;
-    if (!topic.wasNew) {
+topicSchema.post('save', function (topic) {
+    if (!topic._wasNew) {
         return;
     }
     topic.populate({
@@ -45,14 +44,17 @@ topicSchema.post('save', () => {
         model: 'Response',
         populate: {
             path: 'participant',
-            model: 'User'
+            model: 'User',
+            select: 'pushToken phoneNum'
         }
     }).execPopulate().then(topic => {
-        pushService.pushResponseRequest(
-            topic.responses
-                .filter(r => r.participant.pushToken)
-                .map(r => r.participant.pushToken)
-        );
+        let participants = topic.responses
+            .filter(r => r.participant.pushToken)
+            .map(r => r.participant.pushToken);
+        pushService.pushResponseRequest(participants, {topic})
+            .catch(err => {
+                console.error('pushResponseRequest error:', err);
+            });
     });
 });
 

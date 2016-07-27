@@ -15,12 +15,21 @@ const config = {
 const gcmSender = new gcm.Sender(GCM_KEY);
 
 function prepNotificationFormat({title, body, payload}) {
-    const notification = {title, body};
-    let pushMsg = Object.assign({}, config, {notification});
+    const notification = {title, body, 'content-available': '1'};
+
+    // THAT LINE OF CODE WITH NOTIFICATION OBJECT CAUSED ME TO SPEND AT LEAST 6
+    // HOURS TO SOLVE PUSH NOTIFICATION EVENT HANDLER TRIGGER PROBLEM!!!!!!!!!!
+    //let pushMsg = Object.assign({}, config, {notification});
+
+    let pushMsg = Object.assign({}, config);
     return (to, data) => {
         let gcmMessage = new gcm.Message(Object.assign({}, pushMsg, {
-            data: Object.assign({}, data, {payload})
+            data: Object.assign(
+                {title, body, payload},
+                data
+            )
         }));
+        console.log(gcmMessage);
         return new Promise((resolve, reject) => {
             gcmSender.send(
                 gcmMessage,
@@ -34,7 +43,9 @@ function prepNotificationFormat({title, body, payload}) {
 const pushResponseRequest = prepNotificationFormat({
     title: 'New Response Request',
     body: 'You have a new response request.',
-    payload: {'$state': 'tab.responses'}
+    payload: {
+        '$state': 'tab.responses'
+    }
 });
 
 const pushTopicResponse = prepNotificationFormat({

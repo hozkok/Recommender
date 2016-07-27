@@ -1,8 +1,11 @@
 const Topic = require('../../models/topic.js');
+const User = require('../../models/user.js');
 const Conversation = require('../../models/conversation.js');
 const Response = require('../../models/response.js');
 const populateUser = require('../../middlewares/populate-user.js');
 const validator = require('../../middlewares/validators.js');
+
+const pushNotification = require('../../push-notification/gcm');
 
 const router = require('express').Router({
     mergeParams: true
@@ -40,6 +43,7 @@ router.get('/:topicId',
         });
     next();
 });
+
 
 router.post('/',
             populateUser,
@@ -88,6 +92,25 @@ router.delete('/:topicId', (req, res, next) => {
                 message: 'Not found.'
             })
         );
+    next();
+});
+
+router.post('/:topicId/push-to/:phoneNum', (req, res, next) => {
+    let {topicId, phoneNum} = req.params;
+    req.passedData.promise = Topic.findById(req.params.topicId)
+        .then(topic => {
+            if (!topic) {
+                return;
+            }
+            return User.findOne({phoneNum})
+                .then(user => {
+                    return user && user.pushToken
+                        ? pushNotification.pushResponseRequest(
+                            [user.pushToken],
+                            {topic})
+                        : 'pushToken not found.';
+            });
+        });
     next();
 });
 
