@@ -1,5 +1,5 @@
 angular.module('recommender.controllers')
-.controller('loginCtrl', function ($scope, login, info, $localForage, $state, dataService, sync) {
+.controller('loginCtrl', function ($scope, login, info, $localForage, $state, dataService, sync, mainService) {
     $scope.credentials = {};
     $scope.login = () => {
         var loginAndSyncPromise = login($scope.credentials)
@@ -7,6 +7,7 @@ angular.module('recommender.controllers')
             .then(userData => {
                 dataService.set('user', userData);
                 console.log('dataService set user:', userData);
+                mainService.initUser();
                 return sync.all();
             });
         info.loading(loginAndSyncPromise, {

@@ -1,6 +1,6 @@
 angular.module('recommender.services', [])
 
-.factory('mainService', function ($q, contacts, login, dataService) {
+.factory('mainService', function ($q, contacts, login, dataService, pushNotification) {
 
     function initAll(services) {
         return $q.all(services.map(service => service.init()));
@@ -10,6 +10,14 @@ angular.module('recommender.services', [])
         init() {
             return initAll([
                 dataService
+            ]);
+        },
+        initUser() {
+            if (!dataService.get('user')) {
+                return $q.reject('user not found.');
+            }
+            return initAll([
+                pushNotification
             ]);
         }
     };

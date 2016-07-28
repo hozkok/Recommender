@@ -32,6 +32,7 @@ angular.module('recommender', [
                 //sync.clear();
                 if (dataService.get('user')) {
                     sync.all();
+                    mainService.initUser();
                     $state.go('tab.topics');
                 } else {
                     $state.go('login');

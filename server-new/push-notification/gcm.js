@@ -15,10 +15,10 @@ const config = {
 const gcmSender = new gcm.Sender(GCM_KEY);
 
 function prepNotificationFormat({title, body, payload}) {
-    const notification = {title, body, 'content-available': '1'};
 
     // THAT LINE OF CODE WITH NOTIFICATION OBJECT CAUSED ME TO SPEND AT LEAST 6
     // HOURS TO SOLVE PUSH NOTIFICATION EVENT HANDLER TRIGGER PROBLEM!!!!!!!!!!
+    //const notification = {title, body, 'content-available': '1'};
     //let pushMsg = Object.assign({}, config, {notification});
 
     let pushMsg = Object.assign({}, config);
@@ -44,7 +44,8 @@ const pushResponseRequest = prepNotificationFormat({
     title: 'New Response Request',
     body: 'You have a new response request.',
     payload: {
-        '$state': 'tab.responses'
+        '$state': 'tab.responses',
+        'type': 'response-request'
     }
 });
 
@@ -53,7 +54,8 @@ const pushTopicResponse = prepNotificationFormat({
     body: 'You have a new response for topic.',
     payload: {
         '$state': 'tab.topic',
-        '$stateParams': JSON.stringify({id: '<topic id here>'})
+        '$stateParams': JSON.stringify({id: '<topic id here>'}),
+        'type': 'topic-response'
     }
 });
 

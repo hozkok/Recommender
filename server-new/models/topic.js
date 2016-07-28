@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-const pushService = require('../push-notification/gcm');
 
 //const Response = new Schema({
 //    participant: {type: ObjectId, required: true, unique: true}, //user id
@@ -30,33 +29,34 @@ const topicSchema = new Schema({
     responses: [ObjectId] //response id
 });
 
-topicSchema.pre('save', function (next) {
-    this._wasNew = this.isNew;
-    next();
-});
-
-topicSchema.post('save', function (topic) {
-    if (!topic._wasNew) {
-        return;
-    }
-    topic.populate({
-        path: 'responses',
-        model: 'Response',
-        populate: {
-            path: 'participant',
-            model: 'User',
-            select: 'pushToken phoneNum'
-        }
-    }).execPopulate().then(topic => {
-        let participants = topic.responses
-            .filter(r => r.participant.pushToken)
-            .map(r => r.participant.pushToken);
-        pushService.pushResponseRequest(participants, {topic})
-            .catch(err => {
-                console.error('pushResponseRequest error:', err);
-            });
-    });
-});
+// topicSchema.pre('save', function (next) {
+//     this._wasNew = this.isNew;
+//     next();
+// });
+// 
+// const pushService = require('../push-notification/gcm');
+// topicSchema.post('save', function (topic) {
+//     if (!topic._wasNew) {
+//         return;
+//     }
+//     topic.populate({
+//         path: 'responses',
+//         model: 'Response',
+//         populate: {
+//             path: 'participant',
+//             model: 'User',
+//             select: 'pushToken phoneNum'
+//         }
+//     }).execPopulate().then(topic => {
+//         let participants = topic.responses
+//             .filter(r => r.participant.pushToken)
+//             .map(r => r.participant.pushToken);
+//         pushService.pushResponseRequest(participants, {topic})
+//             .catch(err => {
+//                 console.error('pushResponseRequest error:', err);
+//             });
+//     });
+// });
 
 const Topic = mongoose.model('Topic', topicSchema);
 

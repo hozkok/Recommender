@@ -31,9 +31,15 @@
                         class="item-text-wrap"
                         ng-bind-html="
                         r.text ||
+                        (r.isCancelled ? 'cancelled.' : 'pending...')">
+                    </p>
+                    <!--p
+                        class="item-text-wrap"
+                        ng-bind-html="
+                        r.text ||
                         (r.isCancelled ? 'cancelled.' : 'pending...')
                         | tel">
-                    </p>
+                    </p-->
                 </div>
             </ion-item>
         <ion-list>
