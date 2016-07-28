@@ -13,16 +13,16 @@ angular.module('recommender.routes', [])
                     $scope.share = share.bind(undefined, {
                         message: 'Recommender is a great app. want to try out?',
                         subject: 'Recommender App',
-                        link: 'web.recommender.com',
+                        link: 'web.recommender.com'
                     });
                     $scope.sync = () => {
                         info.loading(sync.all(), {
                             successMessage: 'sync is done.',
-                            errorMessage: undefined,
+                            errorMessage: undefined
                         });
                     };
                 },
-                abstract: true,
+                abstract: true
             })
             .state('tab.topics', {
                 url: '/topics',
@@ -32,7 +32,8 @@ angular.module('recommender.routes', [])
             .state('tab.topic', {
                 url: '/topics/:id',
                 templateUrl: 'templates/topic.html',
-                controller: 'topicCtrl'
+                controller: 'topicCtrl',
+                params: {id: null}
             })
             .state('tab.responses', {
                 url: '/responses',

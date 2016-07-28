@@ -1,5 +1,6 @@
 angular.module('recommender.controllers')
 .controller('topicCtrl', function ($scope, $stateParams, utils, selectParticipants, req, dataService, info, $q, sync, $ionicPopup, $ionicHistory) {
+    console.log('$stateParams:', $stateParams);
     var topicId = $stateParams.id;
     var topicStore = utils.instance({name: '/topics'});
     topicStore.getItem(topicId)
@@ -11,7 +12,7 @@ angular.module('recommender.controllers')
 
     $scope.$on('topicdata', (event, newTopicData) => {
         if (newTopicData._id === topicId) {
-            $scope.topic = topic;
+            $scope.topic = newTopicData;
         }
     });
 
@@ -21,34 +22,33 @@ angular.module('recommender.controllers')
                 .map(response => response.participant._id),
 
             onTap: (event, selectedParticipants) => {
-                    var participants = $scope.topic.participants;
-                    if (selectedParticipants.length === 0) {
-                        return;
-                    }
-                    var responses = selectedParticipants.map(p => {
-                        return {
-                            parentTopic: $scope.topic,
-                            participant: p,
-                            addedBy: dataService.get('user'),
-                            shareDegree: 0
-                        };
-                    });
-                    var promise = $q.all(responses.map(newResponse =>
-                        req.post('/responses', newResponse)
-                    )).then(results => {
-                        console.log(results);
-                        return req.get('/topics/' + $scope.topic._id)
-                            .then(httpRes => {
-                                $scope.topic = httpRes.data;
-                                return topicStore.setItem($scope.topic._id,
-                                                          httpRes.data);
-                            });
-                    });
-                    info.loading(promise, {
-                        successMessage: 'participants added.',
-                        errorMessage: undefined,
-                    });
+                if (selectedParticipants.length === 0) {
+                    return;
                 }
+                var responses = selectedParticipants.map(p => {
+                    return {
+                        parentTopic: $scope.topic,
+                        participant: p,
+                        addedBy: dataService.get('user'),
+                        shareDegree: 0
+                    };
+                });
+                var promise = $q.all(responses.map(newResponse =>
+                    req.post('/responses', newResponse)
+                )).then(results => {
+                    console.log(results);
+                    return req.get('/topics/' + $scope.topic._id)
+                        .then(httpRes => {
+                            $scope.topic = httpRes.data;
+                            return topicStore.setItem($scope.topic._id,
+                                                      httpRes.data);
+                        });
+                });
+                info.loading(promise, {
+                    successMessage: 'participants added.',
+                    errorMessage: undefined
+                });
+            }
         });
     };
 
@@ -69,7 +69,7 @@ angular.module('recommender.controllers')
                     }),
                 {
                     successMessage: 'Topic has been deleted.',
-                    errorMessage: undefined,
+                    errorMessage: undefined
                 }
             );
         });

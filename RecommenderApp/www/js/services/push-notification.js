@@ -1,17 +1,25 @@
 angular.module('recommender.services')
-.factory('pushNotification', function ($q, $cordovaPushV5, config, req, $rootScope, sync, $state) {
+.factory('pushNotification', function ($q, $cordovaPushV5, config, req, $rootScope, sync, $state, $ionicHistory) {
     var options = config.pushNotificationOptions;
 
     function handleResponse(response) {
-        var topicId = response.parentTopic;
+        var topicId = response.parentTopic._id
+            ? response.parentTopic._id
+            : response.parentTopic;
         return sync.syncTopic(topicId)
             .then(() => {
                 $state.go('tab.topic', {id: topicId});
             });
     }
 
-    function handleResponseReq(responseReq) {
-        return responseReq;
+    function handleResponseReq() {
+        return sync.syncResponses()
+            .then(() => {
+                $ionicHistory.nextViewOptions({
+                    historyRoot: true
+                });
+                $state.go('tab.responses');
+            });
     }
 
     function handleOther(data) {
@@ -19,6 +27,16 @@ angular.module('recommender.services')
     }
 
     function dataHandler(data) {
+        switch (data.additionalData.payload.type) {
+        case 'response-request':
+            handleResponseReq(data);
+            break;
+        case 'topic-response':
+            handleResponse(data.additionalData.response);
+            break;
+        default:
+            console.error('undefined push notification type.');
+        }
         return data.topic ? handleResponseReq
              : data.response ? handleResponse
              : handleOther;
