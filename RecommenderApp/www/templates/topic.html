@@ -24,11 +24,11 @@
             <ion-item>
                 <strong>Responses:</strong>
                 <div
+                    class="item-text-wrap"
                     style="padding: 5px 0 5px 0; border-top: 1px outset;"
                     ng-repeat="r in topic.responses">
                     {{r.participant.uname}} (+{{r.shareDegree }}) :
                     <p
-                        class="item-text-wrap"
                         ng-bind-html="
                         r.text ||
                         (r.isCancelled ? 'cancelled.' : 'pending...')">

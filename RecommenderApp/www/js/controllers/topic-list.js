@@ -11,12 +11,14 @@ angular.module('recommender.controllers')
     var topicsStorage = utils.instance({name:'/topics'});
 
     function expiryFn(compareDate) {
-        compareDate = compareDate | new Date();
+        compareDate = compareDate || new Date();
         return topic => {
             if (!topic.destructDate) {
                 return true;
             }
-            return compareDate < new Date(topic.destructDate);
+            var destructDate = new Date(topic.destructDate);
+            console.log('compareDate:', compareDate, 'destructDate', topic.destructDate, ':::', compareDate < destructDate);
+            return compareDate < destructDate;
         };
     }
 

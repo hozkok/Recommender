@@ -16,13 +16,14 @@ angular.module('recommender.controllers')
     });
 
     function expiryFn(compareDate) {
-        compareDate = compareDate | new Date();
+        compareDate = compareDate || new Date();
         return response => {
-            var expiryDate = response.parentTopic.destructDate;
-            if (!expiryDate) {
+            if (!response.parentTopic.destructDate) {
                 return true;
             }
-            return compareDate < new Date(expiryDate);
+            var destructDate = new Date(response.parentTopic.destructDate);
+            console.log({compareDate, destructDate});
+            return compareDate < destructDate;
         };
     }
 

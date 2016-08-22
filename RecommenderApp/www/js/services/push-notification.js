@@ -22,9 +22,9 @@ angular.module('recommender.services')
             });
     }
 
-    function handleOther(data) {
-        return data;
-    }
+    //function handleOther(data) {
+    //    return data;
+    //}
 
     function dataHandler(data) {
         switch (data.additionalData.payload.type) {
@@ -37,9 +37,9 @@ angular.module('recommender.services')
         default:
             console.error('undefined push notification type.');
         }
-        return data.topic ? handleResponseReq
-             : data.response ? handleResponse
-             : handleOther;
+        //return data.topic ? handleResponseReq
+        //     : data.response ? handleResponse
+        //     : handleOther;
     }
 
     function notificationHandler(event, data) {
