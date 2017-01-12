@@ -19,6 +19,13 @@ Inside the `server-new` directory run;
 npm install
 ```
 
+to run the server run the following command in `server-new` directory;
+```sh
+node server.js
+```
+
+the `PORT` variable in which the server runs is written in `.env-variables` file.
+
 Inside the `RecommenderApp` directory run;
 ```sh
 npm install
