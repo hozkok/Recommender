@@ -7,6 +7,8 @@ const
     compress = require('compression'),
     dotenv = require('dotenv');
 
+mongoose.Promise = Promise;
+
 dotenv.config({path: '.env-variables'});
 
 const server = express();
